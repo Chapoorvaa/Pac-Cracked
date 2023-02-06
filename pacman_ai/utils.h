@@ -45,10 +45,10 @@ struct Queue{
 };
 
 // Push the *data* into the *queue* and update the length
-void push_queue(struct Queue *queue, int* data);
+void push_queue(struct Queue *queue, int data);
 
 // Pop the *data* from the end of the *queue* and returns it. update the length
-int *pop_queue(struct Queue *queue);
+int pop_queue(struct Queue *queue);
 
 // Checks if queue is empty return 1 if true else 0
 int is_queue_empty(struct Queue *queue);
