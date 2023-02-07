@@ -1,1 +1,3 @@
-#inlcude "multi_agents.h"
+#include <stdlib.h>
+#include "utils.h"
+#include "multi_agents.h"
