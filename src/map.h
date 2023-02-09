@@ -3,4 +3,9 @@
 
 // This file will handle all the map generation
 
+typedef struct Map
+{
+
+} Map;
+
 #endif
