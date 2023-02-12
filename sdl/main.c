@@ -42,6 +42,10 @@ int main(int argc,char*argv[])
 					case SDLK_ESCAPE:
 						continuer = 0;
 						break;
+					case SDLK_KP_ENTER:
+						play(screen);
+						break;
+
 				}
 				break;
 		}
