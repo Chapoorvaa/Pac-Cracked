@@ -12,3 +12,4 @@ void init_astar_node(struct Astar_node *node, struct Astar_node *parent, int pos
 void free_astar_node(struct Astar_node *node);
 
 #endif
+
