@@ -1,58 +1,79 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <err.h>
+
 #include <SDL2/SDL.h>
-#include <SDL_image.h>
+#include <SDL2/SDL_image.h>
 
 
-const int INIT_WIDTH = 640;
-const int INIT_HEIGHT = 400;
+// Initial width and height of the window.
+const int INIT_WIDTH = 840;
+const int INIT_HEIGHT = 600;
 
-int main(int argc,char*argv[])
+void draw(SDL_Renderer* renderer, SDL_Texture* texture)
 {
-	SDL_Surface *screen = NULL;
-	SDL_Surface *menu = NULL;
+    SDL_RenderCopy(renderer,texture,NULL,NULL);
+    SDL_RenderPresent(renderer);
+}
 
-	SDL_Rect positionMenu;
-	
-	int continuer = 3 ;
-	SDL_Event event;
+void event_loop(SDL_Renderer* renderer, SDL_Texture* texture)
+{
+    SDL_Event event;
+    while (1)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_QUIT:
+                return;
+            case SDL_WINDOWEVENT_RESIZED:
+                if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+                {
+                    draw(renderer,texture);
+                }
+                break;
+        }
+    }
+}
 
-	if (SDL_Init(SDL_INIT_VIDEO) != 0)
-        	errx(EXIT_FAILURE, "%s", SDL_GetError());
-	
-	/*SDL_WM_SetIcon(IMG_Load("logo.png"),NULL);*/
-	screen = SDL_SetVideoMode(952,442,32,SDL_HWSURFACE | SDL_DOUBLEBUF);
-	SDL_WM_SetCaption("Pac Cracked",NULL);
-	
+int main(int argc, char** argv)
+{
+    if (argc != 2)
+        errx(EXIT_FAILURE, "Usage: image-file");
+    
+    // Initializes the SDL.
+    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+        errx(EXIT_FAILURE, "%s", SDL_GetError());
 
-	menu = IMG_Load("logo.png");
-	positionMenu.x = 0
-	posiionMenu.y = 0
+    // Creates a window.
+    SDL_Window* window = SDL_CreateWindow("Pac Cracked", 0, 0, INIT_WIDTH, INIT_HEIGHT,
+            SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    if (window == NULL)
+        errx(EXIT_FAILURE, "%s", SDL_GetError());
 
-	while(continuer){
-		SDL_WaitEvent(&event);
-		switch(event.type)
-		{
-			case SDL_QUIT:
-				continuer = 0;
-				break;
-			case SDL_KEYDOWN:
-				switch(event.key.keysym.sym)
-				{
-					case SDLK_ESCAPE:
-						continuer = 0;
-						break;
-					case SDLK_KP_ENTER:
-						play(screen);
-						break;
+    // Creates a renderer.
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (renderer == NULL)
+        errx(EXIT_FAILURE, "%s", SDL_GetError());
+        
+    // - Create a texture from the image.
+    SDL_Texture *texture = IMG_LoadTexture(renderer,argv[1]);
 
-				}
-				break;
-		}
-		SDL_BlitSurface(menu,NULL,screen,&positionMenu);
-		SDL_Flip(screen)
-	}
-	SDL_FreeSurface(menu);
-	SDL_Quit();
-	return EXIT_SUCCESS;
+    // Gets the width and the height of the texture.
+    int w, h;
+    if (SDL_QueryTexture(texture, NULL, NULL, &w, &h) != 0)
+        errx(EXIT_FAILURE, "%s", SDL_GetError());
+
+    // - Resize the window according to the size of the image.
+    SDL_SetWindowSize(window,w,h);
+
+    // Dispatches the events.
+    event_loop(renderer,texture);
+
+    // Destroys the objects.
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+
+    return EXIT_SUCCESS;
 }
