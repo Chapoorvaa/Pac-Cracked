@@ -7,6 +7,24 @@
 // This file will handle all the ghost ai and structs
 #include "player.h"
 #include "../src/map.h"
+
+typedef enum GhostMode
+{
+    SCATTER,
+    CHASE,
+    FRIGHTENED,
+    DEAD
+}GhostMode;
+
+
+typedef enum GhostDirection
+{
+	up,
+	down,
+	left,
+	right
+}GhostDirection;
+
 typedef struct Ghost
 {
     char* name;
@@ -31,21 +49,7 @@ typedef struct Ghosts
     struct Ghost* clyde;
 }Ghosts;
 
-typedef enum GhostMode
-{
-    SCATTER,
-    CHASE,
-    FRIGHTENED,
-    DEAD
-}GhostMode;
 
-typedef enum GhostDirection
-{
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT
-}GhostDirection;
 
 // Ghost functions
 
