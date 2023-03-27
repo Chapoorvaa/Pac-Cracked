@@ -12,7 +12,7 @@ void free_map(Map* map);
 
 Map* load_map(char* path);
 
-void save_map(Map* map);
+void save_map(Map* map, char* name);
 
 void print_map(Map* map);
 

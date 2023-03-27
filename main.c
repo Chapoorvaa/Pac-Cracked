@@ -2,6 +2,7 @@
 #include "obj/ghost.h"
 #include "obj/player.h"
 #include "pacman_ai/lib/linked_list.h"
+#include "pacman_ai/minimax.h"
 #include "src/map.h"
 #include <stdlib.h>
 
@@ -23,6 +24,7 @@ void init_game(Game* game, int is_ai, int difficulty, char* map_load){
     game->pacman = init_player();
     game->ghosts = init_ghosts(difficulty);
     game->is_ai = is_ai;
+	game->round = 0;
 }
 
 void free_game(Game* game){
@@ -66,9 +68,7 @@ void update(Game* game){
 				}
 			}
 		}
-
 	}
-
 	// update score if needed and remove objects if needed
 	if (game->map->grid[pac_location] != ' '){
 		if (game->map->grid[pac_location] == '.'){
@@ -79,6 +79,7 @@ void update(Game* game){
 		}
 		game->map->grid[pac_location] = ' ';
 	}
+	game->round++;
 }
 
 int main(){
@@ -107,9 +108,11 @@ int main(){
 		update(game);
 	}
     // - When game done ask if player wants to save map
+	// - Ask for save file name TODO
+	char* name;
 	int save;
 	if (save == 1){
-		save_map(game->map);
+		save_map(game->map, name);
 	}
     // - Free all game assets
 	free_game(game);

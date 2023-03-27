@@ -19,13 +19,23 @@ void free_map(Map* map){
 }
 
 Map* load_map(char* path){
-	//TODO
-	Map *map;
+	Map *map = malloc(sizeof(Map));
+	map->grid = malloc(sizeof(char) * ROW * COL);
+	map->points = 0;
+	FILE *f;
+	f = fopen(path, "r");
+	if (f == NULL){
+		return NULL;
+	}
+	fscanf(f, "%[^\n]", map->grid);
+	fclose(f);
 	return map;
 }
 
-void save_map(Map* map){
-	//TODO
+void save_map(Map* map, char* name){
+	FILE *f = fopen("./%s.txt", name);
+	fprintf(f, "%s\n", map->grid);
+	fclose(f);
 }
 
 void print_map(Map* map) 

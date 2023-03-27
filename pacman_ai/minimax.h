@@ -2,6 +2,8 @@
 #define MINIMAX_H
 
 #include <stddef.h>
+#include "lib/tree.h"
+#include "../main.h"
 
 /*
  * Reward enum:
@@ -19,8 +21,14 @@ enum Rewards {
     eat_ghost = 20,
 };
 
+gtree *create_tree(Game *game, size_t depth);
+
+void update_tree(Game *game, gtree *tree);
+
+int make_decision(gtree *tree);
+
 // Using a decision tree decide pacmans next movement
-int minimax(size_t depth, char** grid);
+int minimax(size_t depth, Game *game);
 /*
  * - Create decision tree
  * - Create initial state node

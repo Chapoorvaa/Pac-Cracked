@@ -2,7 +2,6 @@
 #define MAIN_H
 
 #include "pacman_ai/search.h"
-#include "pacman_ai/minimax.h"
 #include "obj/ghost.h"
 #include "obj/player.h"
 #include "src/map.h"
@@ -20,11 +19,22 @@
 #define HARD 4
 
 typedef struct Game{
+	int round;
     int difficulty;
     int is_ai;
     Player* pacman;
     Map* map;
     llist* ghosts;
 } Game;
+
+llist* init_ghosts(int difficulty);
+
+void init_game(Game* game, int is_ai, int difficulty, char* map_load);
+
+void free_game(Game* game);
+
+int game_over(Game* game);
+
+void update(Game* game);
 
 #endif
