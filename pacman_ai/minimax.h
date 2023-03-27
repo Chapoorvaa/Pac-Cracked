@@ -27,6 +27,8 @@ void update_tree(Game *game, gtree *tree);
 
 gtree* make_decision(gtree *tree);
 
+void free_minimax(gtree* tree);
+
 // Using a decision tree decide pacmans next movement
 gtree* minimax(gtree* tree);
 

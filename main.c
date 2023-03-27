@@ -5,6 +5,8 @@
 #include "pacman_ai/minimax.h"
 #include "src/map.h"
 #include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 
 llist* init_ghosts(int difficulty){
 	//TODO
@@ -60,13 +62,17 @@ void update(Game* game){
 		// check if pacman and ghost overlap and do what is needed
 		if (ghost_location == pac_location){
 			if (ghost->mode == SCATTER || ghost->mode == CHASE){
-				player_respawn(game->pacman);	
+				player_respawn(game->pacman);
+				game->pacman->lives--;
+				game->map->points += DEATH;
+				if (game_over(game)){
+					game->map->points += GAME_OVER;
+				}
 			}
 			else{
 				if (ghost->mode == FRIGHTENED){
-					// TODO
-					// ADD THE POINTS IF EATEN OR IF PACMAN EATS A GHOST
-					// ALSO ADD THE POINTS FOR LOSS OF LIFE AND GAME OVER
+					game->map->points += EAT_GHOST;
+					ghost->mode = DEAD;
 				}
 			}
 		}
@@ -99,6 +105,10 @@ int main(){
 	char* map_load;
 	Game* game;
 	init_game(game, is_ai, difficulty, map_load);
+	gtree* minimax_tree;
+	if (game->is_ai == 1){
+		minimax_tree = create_tree(game, 6);
+	}
 	while (game_over(game) == 0){
     //   .Start Gameplay loop (while not_won):
     //      _Print Board
@@ -107,8 +117,19 @@ int main(){
     //      _Update Pacman Direction
     //      _Update location
     //      _Update Score
-		update(game);
+		if (game->is_ai != 1){
+			update(game);
+		}
+		else{
+			minimax_tree = minimax(minimax_tree);
+			game = minimax_tree->key;
+		}
+		// Force prints to stdout
+		fflush(stdout);
+		// Makes loop sleep for 1s
+		sleep(1);
 	}
+	free_minimax(minimax_tree);
     // - When game done ask if player wants to save map
 	// - Ask for save file name TODO
 	char* name;
