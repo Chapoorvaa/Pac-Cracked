@@ -77,13 +77,61 @@ void update_tree(Game *game, gtree *tree){
 	}
 }
 
-int make_decision(gtree *tree){
-	// TODO
-	return 1;
+int __make_decision(gtree *tree){
+	if (tree->children->length == 0){
+		Game *game = tree->key;
+		return game->map->points;
+	}
+	else{
+		int max = 0;
+		Game *cur_state = tree->key;
+		for (int i = 1; i <= tree->children->length; i++){
+				int tmp = __make_decision(llist_use(tree->children, i));
+				if (max < tmp){
+					max = tmp;
+				}
+			}
+		return max;
+	}
 }
 
-int minimax(size_t depth, Game *game){
-	// TODO
-	return 1;
+gtree *make_decision(gtree *tree){
+	int max_i = 0;
+	int max = 0;
+	for (int i = 1; i <= tree->children->length; i++){
+		int tmp = __make_decision(llist_use(tree->children, i));
+		if (max < tmp){
+			max = tmp;
+			max_i = i;
+		}
+	}
+	return llist_use(tree->children, max_i);
+}
+
+void free_minimax(gtree* tree){
+	for (int i = 1; i <= tree->children->length; i++){
+		free_minimax(llist_use(tree->children, i));
+	}
+	Game *game = tree->key;
+	free_game(game);
+	free(tree->key);
+	free(tree->children);
+	free(tree);
+}
+
+gtree *minimax(gtree* tree){
+	gtree* to_keep = make_decision(tree);
+	for (int i = 1; i <= tree->children->length; i++){
+		gtree* t = llist_use(tree->children, i);
+		if (t != to_keep){
+			free_minimax(t);
+		}
+	}
+	Game *game = tree->key;
+	free_game(game);
+	free(tree->key);
+	free(tree->children);
+	free(tree);
+	return to_keep;
 }
 

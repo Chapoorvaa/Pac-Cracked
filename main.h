@@ -12,6 +12,10 @@
 
 #define POWER_PELLET 500
 #define TICTAC 10
+#define EAT_GHOST 200
+#define DEATH -100
+#define GAME_OVER -10000
+
 #define WALL '#'
 
 #define PEACEFULL 0

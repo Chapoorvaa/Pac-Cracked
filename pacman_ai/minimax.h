@@ -25,19 +25,9 @@ gtree *create_tree(Game *game, size_t depth);
 
 void update_tree(Game *game, gtree *tree);
 
-int make_decision(gtree *tree);
+gtree* make_decision(gtree *tree);
 
 // Using a decision tree decide pacmans next movement
-int minimax(size_t depth, Game *game);
-/*
- * - Create decision tree
- * - Create initial state node
- * - Start making the tree:
- *   . Get all directions pacman can go to
- *   . Get all ghost movement and update
- *   . Set the amount of points at that point in the gamestate
- *      *redo till depth hits 1*
- * - Retrace path and set direction
- * - Return the direction
- */
+gtree* minimax(gtree* tree);
+
 #endif

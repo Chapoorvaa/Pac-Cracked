@@ -12,7 +12,7 @@ Player* init_player(){
 }
 
 void free_player(Player *pacman){
-	//TODO
+	free(pacman);
 }
 
 void player_respawn(Player* pacman){

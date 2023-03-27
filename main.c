@@ -64,7 +64,9 @@ void update(Game* game){
 			}
 			else{
 				if (ghost->mode == FRIGHTENED){
-					//TODO
+					// TODO
+					// ADD THE POINTS IF EATEN OR IF PACMAN EATS A GHOST
+					// ALSO ADD THE POINTS FOR LOSS OF LIFE AND GAME OVER
 				}
 			}
 		}
