@@ -29,27 +29,27 @@ int main() {
     SDL_Texture* menu_texture = SDL_CreateTextureFromSurface(renderer, menu_surface);
     SDL_FreeSurface(menu_surface);
 
-    SDL_Surface* play_surface = IMG_Load("play.png");
+    SDL_Surface* play_surface = IMG_Load("menu_buttons/play.png");
     SDL_Texture* play_texture = SDL_CreateTextureFromSurface(renderer, play_surface);
     SDL_FreeSurface(play_surface);
 
-    SDL_Surface* select_map_surface = IMG_Load("select_map.png");
+    SDL_Surface* select_map_surface = IMG_Load("menu_buttons/select_map.png");
     SDL_Texture* select_map_texture = SDL_CreateTextureFromSurface(renderer, select_map_surface);
     SDL_FreeSurface(select_map_surface);
 
-    SDL_Surface* high_score_surface = IMG_Load("high_score.png");
+    SDL_Surface* high_score_surface = IMG_Load("menu_buttons/high_score.png");
     SDL_Texture* high_score_texture = SDL_CreateTextureFromSurface(renderer, high_score_surface);
     SDL_FreeSurface(high_score_surface);
 
-    SDL_Surface* help_surface = IMG_Load("help.png");
+    SDL_Surface* help_surface = IMG_Load("menu_buttons/help.png");
     SDL_Texture* help_texture = SDL_CreateTextureFromSurface(renderer, help_surface);
     SDL_FreeSurface(help_surface);
 
-    SDL_Surface* about_surface = IMG_Load("about.png");
+    SDL_Surface* about_surface = IMG_Load("menu_buttons/about.png");
     SDL_Texture* about_texture = SDL_CreateTextureFromSurface(renderer, about_surface);
     SDL_FreeSurface(about_surface);
 
-    SDL_Surface* quit_surface = IMG_Load("quit.png");
+    SDL_Surface* quit_surface = IMG_Load("menu_buttons/quit.png");
     SDL_Texture* quit_texture = SDL_CreateTextureFromSurface(renderer, quit_surface);
     SDL_FreeSurface(quit_surface);
 
