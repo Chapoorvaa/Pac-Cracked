@@ -117,7 +117,38 @@ int main() {
         if (event.type == SDL_QUIT) {
             break;
         } 
-       
+        else if (event.type == SDL_MOUSEBUTTONDOWN) {
+
+            int x = event.button.x;
+            int y = event.button.y;
+    
+            // Check if Play button was clicked
+            if (x >= play_x && x <= play_x + BUTTON_WIDTH &&
+                y >= play_y && y <= play_y + BUTTON_HEIGHT) {
+                // Handle Play button click
+            }
+
+            else if (x >= select_map_x && x <= select_map_x + BUTTON_WIDTH &&
+             y >= select_map_y && y <= select_map_y + BUTTON_HEIGHT) {
+            // Handle Select Map button click
+            }
+            else if (x >= high_score_x && x <= high_score_x + BUTTON_WIDTH &&
+             y >= high_score_y && y <= high_score_y + BUTTON_HEIGHT) {
+                // Handle High Score button click
+            }
+            else if (x >= help_x && x <= help_x + BUTTON_WIDTH &&
+             y >= help_y && y <= help_y + BUTTON_HEIGHT) {
+                // Handle Help button click
+            }
+            else if (x >= about_x && x <= about_x + BUTTON_WIDTH &&
+             y >= about_y && y <= about_y + BUTTON_HEIGHT) {
+                // Handle About button click
+            }
+            else if (x >= quit_x && x <= quit_x + BUTTON_WIDTH &&
+             y >= quit_y && y <= quit_y + BUTTON_HEIGHT) {
+                break; 
+            }
+        }
     }
 
     // Clean up
