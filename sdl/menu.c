@@ -66,9 +66,8 @@ int main() {
     dst_rect.w = image_width;
     dst_rect.h = image_height;
 
-
     // Calculate button positions
-    const int BUTTON_WIDTH = 250;
+    const int BUTTON_WIDTH = 200;
     const int BUTTON_HEIGHT = 40;
     const int BUTTON_MARGIN = 20;
 
