@@ -4,7 +4,7 @@
 #include "map.h"
 
 #define ROW 28
-#define COL 36
+#define COL 27
 
 Map *init_map(){
 	Map *map = malloc(sizeof(Map));

@@ -4,8 +4,9 @@
 #include "utils.h"
 
 #define WALL '#'
-#define GRID_WIDTH 28
-#define GRID_HEIGHT 36
+#define WALL2 '_'
+#define GRID_WIDTH 27
+#define GRID_HEIGHT 28
 #define NOT_VISITED -5
 #define VISITED 1
 
@@ -50,7 +51,7 @@ void bfs(char *grid, llist *stack, int start, int end){
             form_adjlist(*n, adjlist);
             for (int i = 0; i < adjlist->length; i++){
                 int *iter = llist_use(adjlist, i);
-                if (M[*iter] == NOT_VISITED && !(grid[*iter] == WALL)){
+                if (M[*iter] == NOT_VISITED && !(grid[*iter] == WALL) && !(grid[*iter] == WALL2)){
                    llist_prepend(q, iter);
                    M[*iter] = *n;
                 }
@@ -76,7 +77,7 @@ int __dfs(char *grid, llist *stack, int start, int end, int *M, int parent){
             return 1;
         }
         else{
-            if (M[*iter] == NOT_VISITED && !(grid[*iter])){
+            if (M[*iter] == NOT_VISITED && !(grid[*iter] == WALL) && !(grid[*iter] == WALL2)){
                 if (1 == __dfs(grid, stack, *iter, end, M, start)){
                     llist_prepend(stack, iter);
                     return 1;

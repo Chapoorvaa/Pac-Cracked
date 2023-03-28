@@ -8,19 +8,19 @@
 int *can_goto(Game *game){
 	int x = game->pacman->x;
 	int y = game->pacman->y;
-	int pos = y * 28 + x;
+	int pos = y * COL + x;
 	int* options = calloc(4, sizeof(int));
 	char* grid = game->map->grid;
-	if(grid[pos + 28] != WALL){
-		options[0] = 28;
+	if(grid[pos + COL] != WALL && grid[pos + COL] != WALL2){
+		options[0] = COL;
 	}
-	if(grid[pos - 28] != WALL){
-		options[1] = -28;
+	if(grid[pos - COL] != WALL && grid[pos - COL] != WALL2){
+		options[1] = -COL;
 	}
-	if(grid[pos + 1] != WALL){
+	if(grid[pos + 1] != WALL && grid[pos + 1] != WALL2){
 		options[2] = 1;
 	}
-	if(grid[pos - 1] != WALL){
+	if(grid[pos - 1] != WALL && grid[pos + 1] != WALL2){
 		options[3] = -1;
 	}
 	return options;
