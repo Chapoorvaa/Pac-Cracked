@@ -1,23 +1,25 @@
 #include "ghost.h"
 
-void ghostInit(struct Ghost* ghost, char* label, int x, int y, int speed, int direction, int mode,
+Ghost* ghostInit(char* label, int x, int y, int speed, int direction, int mode,
  int scatterTargetX, int scatterTargetY, int spawnX, int spawnY)
 {
+    Ghost* ghost = malloc(sizeof(Ghost));
     ghost->name = label;
-    ghost->x = x;
-    ghost->y = y;
+    ghost->x = spawnX;
+    ghost->y = spawnY;
     ghost->speed = speed;
     ghost->direction = direction;
-    ghost->mode = mode;
-    ghost->targetX = 0;
-    ghost->targetY = 0;
-    ghost->scatterTargetX = 0;
-    ghost->scatterTargetY = 0;
+    ghost->mode = mode
+    ghost->targetX = spawnX;
+    ghost->targetY = spawnY;
+    ghost->scatterTargetX = scatterTargetX;
+    ghost->scatterTargetY = scatterTargetY;
     ghost->spawnX = spawnX;
     ghost->spawnY = spawnY;
+    return ghost;
 }
 
-void move(Ghost ghost*){
+void move(Ghost* ghost){
     // depending on the direction of the ghost, move it
     switch (ghost->direction)
     {
@@ -36,9 +38,12 @@ void move(Ghost ghost*){
     }
 }
 
-void GhostMove(Ghost* ghost, char** map, struct Player* player){
+void GhostMove(Ghost* ghost, Map* map, struct Player* player){
     // check if the ghost is in an intersection
-    if (map[ghost->x][ghost->y] == 'D' || map[ghost->x][ghost->y] == '4')
+    if (map->grid[(ghost->y * COL) + ghost->x] == 'D' ||
+        map->grid[(ghost->y * COL) + ghost->x] == '4' ||
+        map->grid[(ghost->y * COL) + ghost->x] == '3' ||
+        map->grid[(ghost->y * COL) + ghost->x] == 'E')
         ghostPathing(ghost, map, player);
     else
         checkWall(ghost, map);
@@ -46,57 +51,57 @@ void GhostMove(Ghost* ghost, char** map, struct Player* player){
 }
 
 // if direction is NULL then we only check the ghost direction
-void checkWall(Ghost* ghost, char** map){
+void checkWall(Ghost* ghost, Map* map){
     //check the next position of the ghost and if it's a wall then change the direction to the only direction it can go
     switch (ghost->direction)
     {
         case UP:
-            if(map[ghost->y - 1][ghost->x] == 'X')
+            if(map->grid[((ghost->y - 1) * COL) + ghost->x]== 'X')
             {
-                if(map[ghost->y][ghost->x - 1] != 'X')
+                if(map->grid[(ghost->y * COL) + ghost->x - 1] != 'X')
                 {
                     ghost->direction = LEFT;
                 }
-                else if(map[ghost->y][ghost->x + 1] != 'X')
+                else if(map->grid[(ghost->y * COL) + ghost->x + 1] != 'X')
                 {
                     ghost->direction = RIGHT;
                 }
             }
             break;
         case DOWN:
-            if(map[ghost->y + 1][ghost->x] == 'X')
+            if(map->grid[(ghost->y + 1 * COL) + ghost->x] == 'X')
             {
-                if(map[ghost->y][ghost->x - 1] != 'X')
+                if(map->grid[(ghost->y * COL) + ghost->x - 1] != 'X')
                 {
                     ghost->direction = LEFT;
                 }
-                else if(map[ghost->y][ghost->x + 1] != 'X')
+                else if(map->grid[(ghost->y * COL) + ghost->x + 1] != 'X')
                 {
                     ghost->direction = RIGHT;
                 }
             }
             break;
         case LEFT:
-            if(map[ghost->y][ghost->x - 1] == 'X')
+            if(map->grid[(ghost->y * COL) + ghost->x - 1] == 'X')
             {
-                if(map[ghost->y - 1][ghost->x] != 'X')
+                if(map->grid[((ghost->y - 1) * COL) + ghost->x] != 'X')
                 {
                     ghost->direction = UP;
                 }
-                else if(map[ghost->y + 1][ghost->x] != 'X')
+                else if(map->grid[((ghost->y + 1) * COL) + ghost->x] != 'X')
                 {
                     ghost->direction = DOWN;
                 }
             }
             break;
         case RIGHT:
-            if(map[ghost->y][ghost->x + 1] == 'X')
+            if(map->grid[ghost->y * COL + ghost->x + 1] == 'X')
             {
-                if(map[ghost->y - 1][ghost->x] != 'X')
+                if(map->grid[((ghost->y - 1) * COL) + ghost->x] != 'X')
                 {
                     ghost->direction = UP;
                 }
-                else if(map[ghost->y + 1][ghost->x] != 'X')
+                else if(map->grid[((ghost->y + 1) * COL) + ghost->x] != 'X')
                 {
                     ghost->direction = DOWN;
                 }
@@ -105,14 +110,10 @@ void checkWall(Ghost* ghost, char** map){
     }
 }
 
-void ghostPathing(struct Ghost* ghost, char** map, struct Player* player)
+void ghostPathing(Ghost* ghost, char** map, struct Player* player)
 {
-    // Check if the ghost is in a intersection
-    // If it is, check the ghost's state and target it's next position
-    // If it's not, check if the next position is a wall
-    // If it is, change the direction to where the only direction it can go, update the next position + direction
-    // If it's not, move the ghost
-    
+    // Depending on the ghost mode, and knowing that the ghost is at an
+    // intersection, then choose the direction of the ghost
     switch (ghost->mode)
     {
         case SCATTER:
@@ -125,46 +126,51 @@ void ghostPathing(struct Ghost* ghost, char** map, struct Player* player)
             {
                 // find the smallest heuristic value
                 case UP:
-                    if(map[ghost->y - 1][ghost->x] != 'X' && (map[ghost->y][ghost->x] != 'D' || map[ghost->y][ghost->x] != '4'))
+                    if(map->grid[(ghost->y - 1) * COL + ghost->x] != 'X' &&
+                            (map->grid[ghost->y * COL + ghost->x] != '4' ||
+                             map->grid[ghost->y * COL + ghost->x] != 'E'))
                     {
-                        int distance = abs(ghost->x - ghost->targetX) + abs(ghost->y - 1 - ghost->targetY);
+                        int distance = abs(ghost->x - ghost->targetX) + 
+                            abs(ghost->y - 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = UP;
                         }
                     }
-                    if(map[ghost->y][ghost->x - 1] != 'X')
+                    if(map->grid[ghost->y * COL + ghost->x - 1] != 'X')
                     {
-                        int distance = abs(ghost->x - 1 - ghost->targetX) + abs(ghost->y - ghost->targetY);
+                        int distance = abs(ghost->x - 1 - ghost->targetX) +
+                            abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = LEFT;
                         }
                     }
-                    if(map[ghost->y][ghost->x + 1] != 'X')
+                    if(map->grid[ghost->y * COL + ghost->x + 1] != 'X')
                     {
-                        int distance = abs(ghost->x + 1 - ghost->targetX) + abs(ghost->y - ghost->targetY);
+                        int distance = abs(ghost->x + 1 - ghost->targetX) +
+                            abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = RIGHT;
                         }
                     }
-                    checkWall(ghost, map);
                     break;
                 case DOWN:
-                    if(map[ghost->y + 1][ghost->x] != 'X')
+                    if(map->grid[(ghost->y + 1) * COL + ghost->x] != 'X')
                     {
-                        int distance = abs(ghost->x - ghost->targetX) + abs(ghost->y + 1 - ghost->targetY);
+                        int distance = abs(ghost->x - ghost->targetX) +
+                            abs(ghost->y + 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = DOWN;
                         }
                     }
-                    if(map[ghost->y][ghost->x - 1] != 'X')
+                    if(map[ghost->y * COL + ghost->x - 1] != 'X')
                     {
                         int distance = abs(ghost->x - 1 - ghost->targetX) + abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
@@ -173,9 +179,10 @@ void ghostPathing(struct Ghost* ghost, char** map, struct Player* player)
                             ghost->direction = LEFT;
                         }
                     }
-                    if(map[ghost->y][ghost->x + 1] != 'X')
+                    if(map[ghost->y * COL + ghost->x + 1] != 'X')
                     {
-                        int distance = abs(ghost->x + 1 - ghost->targetX) + abs(ghost->y - ghost->targetY);
+                        int distance = abs(ghost->x + 1 - ghost->targetX) +
+                            abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
@@ -184,27 +191,30 @@ void ghostPathing(struct Ghost* ghost, char** map, struct Player* player)
                     }
                     break;
                 case LEFT:
-                    if(map[ghost->y - 1][ghost->x] != 'X')
+                    if(map[(ghost->y - 1) * COL + ghost->x] != 'X')
                     {
-                        int distance = abs(ghost->x - ghost->targetX) + abs(ghost->y - 1 - ghost->targetY);
+                        int distance = abs(ghost->x - ghost->targetX) +
+                            abs(ghost->y - 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = UP;
                         }
                     }
-                    if(map[ghost->y + 1][ghost->x] != 'X')
+                    if(map[(ghost->y + 1) * COL + ghost->x] != 'X')
                     {
-                        int distance = abs(ghost->x - ghost->targetX) + abs(ghost->y + 1 - ghost->targetY);
+                        int distance = abs(ghost->x - ghost->targetX) +
+                            abs(ghost->y + 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = DOWN;
                         }
                     }
-                    if(map[ghost->y][ghost->x - 1] != 'X')
+                    if(map[ghost->y * COL + ghost->x - 1] != 'X')
                     {
-                        int distance = abs(ghost->x - 1 - ghost->targetX) + abs(ghost->y - ghost->targetY);
+                        int distance = abs(ghost->x - 1 - ghost->targetX) +
+                            abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
@@ -212,27 +222,30 @@ void ghostPathing(struct Ghost* ghost, char** map, struct Player* player)
                         }
                     }
                 case RIGHT:
-                    if(map[ghost->y - 1][ghost->x] != 'X')
+                    if(map[(ghost->y - 1) * COL + ghost->x] != 'X')
                     {
-                        int distance = abs(ghost->x - ghost->targetX) + abs(ghost->y - 1 - ghost->targetY);
+                        int distance = abs(ghost->x - ghost->targetX) +
+                            abs(ghost->y - 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = UP;
                         }
                     }
-                    if(map[ghost->y + 1][ghost->x] != 'X')
+                    if(map[(ghost->y + 1) * COL + ghost->x] != 'X')
                     {
-                        int distance = abs(ghost->x - ghost->targetX) + abs(ghost->y + 1 - ghost->targetY);
+                        int distance = abs(ghost->x - ghost->targetX) +
+                            abs(ghost->y + 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = DOWN;
                         }
                     }
-                    if(map[ghost->y][ghost->x + 1] != 'X')
+                    if(map[ghost->y * COL + ghost->x + 1] != 'X')
                     {
-                        int distance = abs(ghost->x + 1 - ghost->targetX) + abs(ghost->y - ghost->targetY);
+                        int distance = abs(ghost->x + 1 - ghost->targetX) +
+                            abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
@@ -274,13 +287,10 @@ void ghostPathing(struct Ghost* ghost, char** map, struct Player* player)
                 }
                 else
                 {
-                    ghost->targetX = ghost->spawnX;
-                    ghost->targetY = ghost->spawnY;
+                    ghost->targetX = ghost->scatterTargetX;
+                    ghost->targetY = ghost->scatterTargetY;
                 }
             }
-            // move the ghost
-            
-
             break;
         case FRIGHTENED:
             // Target a random position
@@ -295,27 +305,30 @@ void ghostPathing(struct Ghost* ghost, char** map, struct Player* player)
             switch (ghost->direction)
             {
                 case UP:
-                    if(map[ghost->y - 1][ghost->x] != 'X')
+                    if(map[(ghost->y - 1) * COL + ghost->x] != 'X')
                     {
-                        int distance = abs(ghost->x - ghost->targetX) + abs(ghost->y - 1 - ghost->targetY);
+                        int distance = abs(ghost->x - ghost->targetX) +
+                            abs(ghost->y - 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = UP;
                         }
                     }
-                    if(map[ghost->y][ghost->x - 1] != 'X')
+                    if(map[ghost->y * COL + ghost->x - 1] != 'X')
                     {
-                        int distance = abs(ghost->x - 1 - ghost->targetX) + abs(ghost->y - ghost->targetY);
+                        int distance = abs(ghost->x - 1 - ghost->targetX) + 
+                            abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = LEFT;
                         }
                     }
-                    if(map[ghost->y][ghost->x + 1] != 'X')
+                    if(map[ghost->y * COL + ghost->x + 1] != 'X')
                     {
-                        int distance = abs(ghost->x + 1 - ghost->targetX) + abs(ghost->y - ghost->targetY);
+                        int distance = abs(ghost->x + 1 - ghost->targetX) +
+                            abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
@@ -324,27 +337,30 @@ void ghostPathing(struct Ghost* ghost, char** map, struct Player* player)
                     }
                     break;
                 case DOWN:
-                    if(map[ghost->y + 1][ghost->x] != 'X')
+                    if(map[(ghost->y + 1) * COL + ghost->x] != 'X')
                     {
-                        int distance = abs(ghost->x - ghost->targetX) + abs(ghost->y + 1 - ghost->targetY);
+                        int distance = abs(ghost->x - ghost->targetX) +
+                            abs(ghost->y + 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = DOWN;
                         }
                     }
-                    if(map[ghost->y][ghost->x - 1] != 'X')
+                    if(map[ghost->y * COL + ghost->x - 1] != 'X')
                     {
-                        int distance = abs(ghost->x - 1 - ghost->targetX) + abs(ghost->y - ghost->targetY);
+                        int distance = abs(ghost->x - 1 - ghost->targetX) +
+                            abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = LEFT;
                         }
                     }
-                    if(map[ghost->y][ghost->x + 1] != 'X')
+                    if(map[ghost->y * COL + ghost->x + 1] != 'X')
                     {
-                        int distance = abs(ghost->x + 1 - ghost->targetX) + abs(ghost->y - ghost->targetY);
+                        int distance = abs(ghost->x + 1 - ghost->targetX) +
+                            abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
@@ -353,27 +369,30 @@ void ghostPathing(struct Ghost* ghost, char** map, struct Player* player)
                     }
                     break;
                 case LEFT:
-                    if(map[ghost->y - 1][ghost->x] != 'X')
+                    if(map[(ghost->y - 1) * COL + ghost->x] != 'X')
                     {
-                        int distance = abs(ghost->x - ghost->targetX) + abs(ghost->y - 1 - ghost->targetY);
+                        int distance = abs(ghost->x - ghost->targetX) +
+                            abs(ghost->y - 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = UP;
                         }
                     }
-                    if(map[ghost->y + 1][ghost->x] != 'X')
+                    if(map[(ghost->y + 1) * COL + ghost->x] != 'X')
                     {
-                        int distance = abs(ghost->x - ghost->targetX) + abs(ghost->y + 1 - ghost->targetY);
+                        int distance = abs(ghost->x - ghost->targetX) +
+                            abs(ghost->y + 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = DOWN;
                         }
                     }
-                    if(map[ghost->y][ghost->x - 1] != 'X')
+                    if(map[ghost->y * COL + ghost->x - 1] != 'X')
                     {
-                        int distance = abs(ghost->x - 1 - ghost->targetX) + abs(ghost->y - ghost->targetY);
+                        int distance = abs(ghost->x - 1 - ghost->targetX) +
+                            abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
@@ -382,27 +401,30 @@ void ghostPathing(struct Ghost* ghost, char** map, struct Player* player)
                     }
                     break;
                 case RIGHT:
-                    if(map[ghost->y - 1][ghost->x] != 'X')
+                    if(map[(ghost->y - 1) * COL + ghost->x] != 'X')
                     {
-                        int distance = abs(ghost->x - ghost->targetX) + abs(ghost->y - 1 - ghost->targetY);
+                        int distance = abs(ghost->x - ghost->targetX) +
+                            abs(ghost->y - 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = UP;
                         }
                     }
-                    if(map[ghost->y + 1][ghost->x] != 'X')
+                    if(map[(ghost->y + 1) * COL + ghost->x] != 'X')
                     {
-                        int distance = abs(ghost->x - ghost->targetX) + abs(ghost->y + 1 - ghost->targetY);
+                        int distance = abs(ghost->x - ghost->targetX) +
+                            abs(ghost->y + 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
                             ghost->direction = DOWN;
                         }
                     }
-                    if(map[ghost->y][ghost->x + 1] != 'X')
+                    if(map[ghost->y * COL + ghost->x + 1] != 'X')
                     {
-                        int distance = abs(ghost->x + 1 - ghost->targetX) + abs(ghost->y - ghost->targetY);
+                        int distance = abs(ghost->x + 1 - ghost->targetX) +
+                            abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;

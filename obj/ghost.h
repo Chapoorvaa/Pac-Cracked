@@ -13,7 +13,8 @@ typedef enum GhostMode
     SCATTER,
     CHASE,
     FRIGHTENED,
-    DEAD
+    DEAD,
+    IDLE
 }GhostMode;
 
 
@@ -55,20 +56,20 @@ typedef struct Ghosts
 
 
 // Initialize a ghost
-void ghostInit(struct Ghost* ghost, char* label, int x, int y, int speed,
+Ghost* ghostInit(char* label, int x, int y, int speed,
  int direction, int mode, int scatterTargetX, int scatterTargetY, int spawnX, int spawnY);
 
 // Moves the ghost and checks for collisions + intersections with the map
-void GhostMove(struct Ghost* ghost, char** map, struct Player* player);
+void GhostMove(Ghost* ghost, Map* map, struct Player* player);
 
 // Just moves the ghost (however no checks are made)
 void move(Ghost* ghost);
 
 // Checks if there is a wall in front of the ghost and changes direction
-void checkWall(Ghost* ghost, char** map);
+void checkWall(Ghost* ghost, Map* map);
 
 // Checks if the ghost is at an intersection and changes direction
 // depending on the ghost's attribute
-void ghostPathing(struct Ghost* ghost, char** map, struct Player* player);
+void ghostPathing(Ghost* ghost, Map* map, struct Player* player);
 
 #endif
