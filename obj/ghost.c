@@ -39,12 +39,20 @@ void move(Ghost* ghost){
 }
 
 void GhostMove(Ghost* ghost, Map* map, struct Player* player){
-    // check if the ghost is in an intersection
-    if (map->grid[(ghost->y * COL) + ghost->x] == 'D' ||
-        map->grid[(ghost->y * COL) + ghost->x] == '4' ||
-        map->grid[(ghost->y * COL) + ghost->x] == '3' ||
-        map->grid[(ghost->y * COL) + ghost->x] == 'E')
-        ghostPathing(ghost, map, player);
+    int nb_walls = 0;
+    // check if 4 tiles around the ghost are walls
+    if (map->grid[(ghost->y - 1) * COL + ghost->x] == WALL)
+        nb_walls++;
+    if (map->grid[(ghost->y + 1) * COL + ghost->x] == WALL)
+        nb_walls++;
+    if (map->grid[ghost->y * COL + ghost->x - 1] == WALL)
+        nb_walls++;
+    if (map->grid[ghost->y * COL + ghost->x + 1] == WALL)
+        nb_walls++;
+    // if there are 0/1 walls around the ghost then we can use pathing
+    // This is basically saying that we are at an intersection
+    if (nb_walls < 1)
+        ghostPathing(ghost, map, player, nb_walls);
     else
         checkWall(ghost, map);
     move(ghost);
@@ -110,7 +118,8 @@ void checkWall(Ghost* ghost, Map* map){
     }
 }
 
-void ghostPathing(Ghost* ghost, char** map, struct Player* player)
+void ghostPathing(Ghost* ghost, Ghost* blinky, char** map,
+        struct Player* player, int nb_walls)
 {
     // Depending on the ghost mode, and knowing that the ghost is at an
     // intersection, then choose the direction of the ghost
@@ -121,14 +130,14 @@ void ghostPathing(Ghost* ghost, char** map, struct Player* player)
             ghost->targetX = ghost->scatterTargetX;
             ghost->targetY = ghost->scatterTargetY;
             int min_distance = 1000; // arbitrary large number
-            //find the shortest path to the target position using shortest manhattan distance
+            //find the shortest path to the target position using
+            // the shortest manhattan distance
             switch (ghost->direction)
             {
                 // find the smallest heuristic value
                 case UP:
                     if(map->grid[(ghost->y - 1) * COL + ghost->x] != WALL &&
-                            (map->grid[ghost->y * COL + ghost->x] != '4' ||
-                             map->grid[ghost->y * COL + ghost->x] != 'E'))
+                            nb_walls == 1)
                     {
                         int distance = abs(ghost->x - ghost->targetX) + 
                             abs(ghost->y - 1 - ghost->targetY);
@@ -259,31 +268,67 @@ void ghostPathing(Ghost* ghost, char** map, struct Player* player)
             // Target the ghost's chase target
             if (strcmp(ghost->name, "blinky") == 0)
             {
-                ghost->targetX = pacman->x;
-                ghost->targetY = pacman->y;
+                ghost->targetX = player->x;
+                ghost->targetY = player->y;
             }
             else if (strcmp(ghost->name, "pinky") == 0)
             {
-                ghost->targetX = pacman->x + 4 * pacman->directionX;
-                ghost->targetY = pacman->y + 4 * pacman->directionY;
+                //depending on the direction of the player
+                //target 4 tiles ahead of the player
+                switch (player->direction){
+                    case UP:
+                        ghost->targetX = player->x;
+                        ghost->targetY = player->y - 4;
+                        break;
+                    case DOWN:
+                        ghost->targetX = player->x;
+                        ghost->targetY = player->y + 4;
+                        break;
+                    case LEFT:
+                        ghost->targetX = player->x - 4;
+                        ghost->targetY = player->y;
+                        break;
+                    case RIGHT:
+                        ghost->targetX = player->x + 4;
+                        ghost->targetY = player->y;
+                        break;
+                }
             }
             else if (strcmp(ghost->name, "inky") == 0)
             {
-                ghost->targetX = pacman->x + 2 * pacman->directionX;
-                ghost->targetY = pacman->y + 2 * pacman->directionY;
-                int dx = ghost->x - ghost->targetX;
-                int dy = ghost->y - ghost->targetY;
-                ghost->targetX += dx;
-                ghost->targetY += dy;
+                int dpx;
+                int dpy;
+                switch (player->direction){
+                    case UP:
+                        dpx = player->x;
+                        dpy = player->y - 2;
+                        break;
+                    case DOWN:
+                        dpx = player->x;
+                        dpy = player->y + 2;
+                        break;
+                    case LEFT:
+                        dpx = player->x - 2;
+                        dpy = player->y;
+                        break;
+                    case RIGHT:
+                        dpx = player->x + 2;
+                        dpy = player->y;
+                        break;
+                }
+                int blinkx = blinky->x;
+                int blinky = blinky->y;
+                ghost->targetX = 2 * dpx - blinkx;
+                ghost->targetY = 2 * dpy - blinky;
             }
             else if (strcmp(ghost->name, "clyde") == 0)
             {
-                int dx = ghost->x - pacman->x;
-                int dy = ghost->y - pacman->y;
+                int dx = ghost->x - player->x;
+                int dy = ghost->y - player->y;
                 if (dx * dx + dy * dy > 64)
                 {
-                    ghost->targetX = pacman->x;
-                    ghost->targetY = pacman->y;
+                    ghost->targetX = player->x;
+                    ghost->targetY = player->y;
                 }
                 else
                 {
@@ -294,8 +339,8 @@ void ghostPathing(Ghost* ghost, char** map, struct Player* player)
             break;
         case FRIGHTENED:
             // Target a random position
-            ghost->targetX = rand() % 28;
-            ghost->targetY = rand() % 36;
+            ghost->targetX = rand() % COL;
+            ghost->targetY = rand() % ROW;
             break;
         case DEAD:
             // Target the ghost's spawn position
@@ -433,7 +478,7 @@ void ghostPathing(Ghost* ghost, char** map, struct Player* player)
                     }
                     break;
             break;
-
+            }
 
     }
     

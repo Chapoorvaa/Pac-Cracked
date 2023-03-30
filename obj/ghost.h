@@ -72,8 +72,10 @@ void move(Ghost* ghost);
 // Checks if there is a wall in front of the ghost and changes direction
 void checkWall(Ghost* ghost, Map* map);
 
-// Checks if the ghost is at an intersection and changes direction
-// depending on the ghost's attribute
-void ghostPathing(Ghost* ghost, Map* map, struct Player* player);
+// When the ghost is at an intersection with 0 or 1 adjacent walls 
+// recalculate the target of the ghost
+// depending on the mode
+void ghostPathing(Ghost* ghost, Ghost* blinky Map* map, 
+        struct Player* player, int nb_walls);
 
 #endif
