@@ -8,6 +8,10 @@
 #include "player.h"
 #include "../src/map.h"
 
+#define ROW 29
+#define COL 27
+#define WALL '#'
+
 typedef enum GhostMode
 {
     SCATTER,
