@@ -7,7 +7,7 @@
 #include "src/map.h"
 #include "pacman_ai/lib/linked_list.h"
 
-#define ROW 28
+#define ROW 29
 #define COL 27
 
 #define POWER_PELLET 500
