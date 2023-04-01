@@ -13,7 +13,7 @@
 #define VISITED 1
 
 void form_adjlist(int vertex, llist *adjlist){
-    int *n;
+    int *n = malloc(sizeof(int));
     if (vertex % GRID_WIDTH + 1 < GRID_WIDTH){
         *n = vertex + 1;
         llist_append(adjlist, n);
@@ -30,16 +30,15 @@ void form_adjlist(int vertex, llist *adjlist){
         *n = vertex - GRID_HEIGHT;
         llist_append(adjlist, n);
     }
+    free(n);
 }
 
 int bfs(Game *game){
-    llist *q;
-    init_llist(q);
+    llist *q = init_llist();
     char* grid = game->map->grid;
     int src = game->pacman->y * ROW + game->pacman->x;
     llist_prepend(q, &src);
-    llist *adjlist;
-    init_llist(adjlist);
+    llist *adjlist = init_llist();
     int M[ROW * COL];
     for (int i = 0; i < ROW * COL; i++){
         M[i] = -2;
@@ -49,7 +48,7 @@ int bfs(Game *game){
     while ((q->length != 0) && (not_found == -1)){
         int *n = llist_fastpop(q);
         form_adjlist(*n, adjlist);
-        for(int i = 0; i < adjlist->length; i++){
+        for(size_t i = 0; i < adjlist->length; i++){
             int *adj = (llist_use(adjlist, i));
             char k = grid[*adj];
             if (k == '.'){

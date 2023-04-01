@@ -33,7 +33,7 @@ typedef struct Game{
 
 llist* init_ghosts(int difficulty);
 
-void init_game(Game* game, int is_ai, int difficulty, char* map_load);
+Game *init_game(int is_ai, int difficulty, int map_load);
 
 void free_game(Game* game);
 

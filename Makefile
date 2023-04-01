@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall -Wextra -Werror -pedantic -std=c99 -g
 
 # Add all the .C files from obj, src and game.c to the list of files to compile
-SRC=$(wildcard src/*.c) $(wildcard obj/*.c) $(wildcard pacman_ai/*.c) $(wildcard sdl/*.c)  main.c
+SRC=$(wildcard src/*.c) $(wildcard obj/*.c) $(wildcard pacman_ai/*.c)  main.c
 OBJ=$(SRC:.c=.o)
 
 all: game

@@ -14,7 +14,7 @@ typedef struct llist{
 } llist;
 
 // Creates a new empty linked list
-void init_llist(llist *list);
+llist *init_llist();
 
 // Frees the linked list and all elements inside
 void llist_free(llist *list);

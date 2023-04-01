@@ -18,11 +18,12 @@ llist* init_ghosts(int difficulty){
 	return ghosts;
 }
 
-void init_game(Game* game, int is_ai, int difficulty, char* map_load){
+Game *init_game(int is_ai, int difficulty, int map_load){
+    Game *game;
     game = malloc(sizeof(Game));
     game->difficulty = difficulty;
-    if (map_load != NULL){
-        game->map = load_map(map_load);
+    if (map_load != 1){
+        game->map = load_map("./maps/map_1.txt");
     }
     else{
         game->map = init_map();
@@ -31,6 +32,7 @@ void init_game(Game* game, int is_ai, int difficulty, char* map_load){
     game->ghosts = init_ghosts(difficulty);
     game->is_ai = is_ai;
 	game->round = 0;
+    return game;
 }
 
 void free_game(Game* game){
@@ -101,11 +103,10 @@ int main(){
     // - Load gameplay loop:
     //   .Generate / Load map
     //   .Init player and ghosts
-	int is_ai;
-	int difficulty;
-	char* map_load;
-	Game* game;
-	init_game(game, is_ai, difficulty, map_load);
+	int is_ai = 0;
+	int difficulty = 0;
+	int map_load = 0;
+	Game* game = init_game(is_ai, difficulty, map_load);
 	gtree* minimax_tree;
     llist *ghosts = init_ghosts(difficulty);
 	if (game->is_ai == 1){
@@ -138,7 +139,7 @@ int main(){
 		        	game->pacman = ga->pacman;  
                     break;
             }
-            for (int i = 0; i < ghosts->length; i++){
+            for (size_t i = 0; i < ghosts->length; i++){
                 GhostMove(llist_use(ghosts, i), game->map, game->pacman);
             }
             update(game);
@@ -151,8 +152,8 @@ int main(){
 	free_minimax(minimax_tree);
     // - When game done ask if player wants to save map
 	// - Ask for save file name TODO
-	char* name;
-	int save;
+	char name[128];
+	int save = 0;
 	if (save == 1){
 		save_map(game->map, name);
 	}

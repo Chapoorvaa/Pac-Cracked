@@ -59,8 +59,8 @@ typedef struct Ghosts
 
 
 // Initialize a ghost
-Ghost* ghostInit(char* label, int x, int y, int speed,
- int direction, int mode, int scatterTargetX, int scatterTargetY, int spawnX, int spawnY);
+Ghost* ghostInit(char* label, int speed, int direction, int mode, 
+        int scatterTargetX, int scatterTargetY, int spawnX, int spawnY);
 
 // Moves the ghost and checks for collisions + intersections with the map
 void GhostMove(Ghost* ghost, Map* map, struct Player* player);

@@ -26,7 +26,7 @@ int *can_goto(Game *game){
 	return options;
 }
 
-gtree *create_tree(Game *game, size_t depth){
+gtree *create_tree(Game *game, int depth){
 	gtree* decision_tree = malloc(sizeof(gtree));
 	llist* q = malloc(sizeof(llist));
 	q->length = 0;
@@ -71,7 +71,7 @@ void update_tree(Game *game, gtree *tree){
 		}
 	}
 	else{
-		for (int i = 1; i <= tree->children->length; i++){
+		for (size_t i = 1; i <= tree->children->length; i++){
 			update_tree(game, llist_use(tree->children, i));
 		}
 	}
@@ -84,8 +84,7 @@ int __make_decision(gtree *tree){
 	}
 	else{
 		int max = 0;
-		Game *cur_state = tree->key;
-		for (int i = 1; i <= tree->children->length; i++){
+		for (size_t i = 1; i <= tree->children->length; i++){
 				int tmp = __make_decision(llist_use(tree->children, i));
 				if (max < tmp){
 					max = tmp;
@@ -98,7 +97,7 @@ int __make_decision(gtree *tree){
 gtree *make_decision(gtree *tree){
 	int max_i = 0;
 	int max = 0;
-	for (int i = 1; i <= tree->children->length; i++){
+	for (size_t i = 1; i <= tree->children->length; i++){
 		int tmp = __make_decision(llist_use(tree->children, i));
 		if (max < tmp){
 			max = tmp;
@@ -109,7 +108,7 @@ gtree *make_decision(gtree *tree){
 }
 
 void free_minimax(gtree* tree){
-	for (int i = 1; i <= tree->children->length; i++){
+	for (size_t i = 1; i <= tree->children->length; i++){
 		free_minimax(llist_use(tree->children, i));
 	}
 	Game *game = tree->key;
@@ -121,7 +120,7 @@ void free_minimax(gtree* tree){
 
 gtree *minimax(gtree* tree){
 	gtree* to_keep = make_decision(tree);
-	for (int i = 1; i <= tree->children->length; i++){
+	for (size_t i = 1; i <= tree->children->length; i++){
 		gtree* t = llist_use(tree->children, i);
 		if (t != to_keep){
 			free_minimax(t);

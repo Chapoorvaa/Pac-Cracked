@@ -3,10 +3,12 @@
 #include "linked_list.h"
 
 
-void init_llist(llist *list){
+llist *init_llist(){
+    llist *list;
     list = malloc(sizeof(llist));
     list->length = 0;
     list->head = NULL;
+    return list;
 }
 
 void llist_free(llist *list){

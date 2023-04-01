@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-Ghost* ghostInit(char* label, int x, int y, int speed, int direction, int mode,
+Ghost* ghostInit(char* label, int speed, int direction, int mode,
  int scatterTargetX, int scatterTargetY, int spawnX, int spawnY)
 {
     Ghost* ghost = malloc(sizeof(Ghost));
@@ -231,6 +231,7 @@ void ghostPathing(Ghost* ghost, Map* map, struct Player* player, int nb_walls)
                             ghost->direction = LEFT;
                         }
                     }
+                    break;
                 case right:
                     if(map->grid[(ghost->y - 1) * COL + ghost->x] != WALL)
                     {
