@@ -17,8 +17,7 @@ typedef enum GhostMode
     SCATTER,
     CHASE,
     FRIGHTENED,
-    DEAD,
-    IDLE
+    DEAD
 }GhostMode;
 
 
@@ -75,7 +74,6 @@ void checkWall(Ghost* ghost, Map* map);
 // When the ghost is at an intersection with 0 or 1 adjacent walls 
 // recalculate the target of the ghost
 // depending on the mode
-void ghostPathing(Ghost* ghost, Ghost* blinky Map* map, 
-        struct Player* player, int nb_walls);
+void ghostPathing(Ghost* ghost, Map* map, struct Player* player, int nb_walls);
 
 #endif

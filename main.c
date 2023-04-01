@@ -7,9 +7,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include "pacman_ai/search.h"
 
 llist* init_ghosts(int difficulty){
 	//TODO
+    // if difficulty is easy init 2 ghosts
+    // if hard init 4
+    // peacefull init 0 
 	llist *ghosts;
 	return ghosts;
 }
@@ -58,7 +62,6 @@ void update(Game* game){
 	for (size_t i = 0; i < game->ghosts->length; i++){
 		Ghost *ghost = llist_use(game->ghosts, i);
 		int ghost_location = ghost->x + ROW * ghost->y;
-		ghost_location += ghost->direction;
 		// check if pacman and ghost overlap and do what is needed
 		if (ghost_location == pac_location){
 			if (ghost->mode == SCATTER || ghost->mode == CHASE){
@@ -91,8 +94,6 @@ void update(Game* game){
 }
 
 int main(){
-    //TODO: add SDL OBJECTS
-
     // - Launch the SDL Interface
     // - On Play Button Click
     // - Select Difficulty and if want to load map
@@ -106,6 +107,7 @@ int main(){
 	Game* game;
 	init_game(game, is_ai, difficulty, map_load);
 	gtree* minimax_tree;
+    llist *ghosts = init_ghosts(difficulty);
 	if (game->is_ai == 1){
 		minimax_tree = create_tree(game, 6);
 	}
@@ -121,8 +123,25 @@ int main(){
 			update(game);
 		}
 		else{
-			minimax_tree = minimax(minimax_tree);
-			game = minimax_tree->key;
+            switch (game->difficulty) {
+                case PEACEFULL:
+                    game->pacman->direction = bfs(game);
+                    break;
+                case EASY:
+			        minimax_tree = minimax(minimax_tree);
+                    Game *g = minimax_tree->key;
+		        	game->pacman = g->pacman;                    
+                    break;
+                case HARD:
+			        minimax_tree = minimax(minimax_tree);
+                    Game *ga = minimax_tree->key;
+		        	game->pacman = ga->pacman;  
+                    break;
+            }
+            for (int i = 0; i < ghosts; i++){
+                GhostMove(llist_use(ghosts, i), game->map, game->pacman);
+            }
+            update(game);
 		}
 		// Force prints to stdout
 		fflush(stdout);

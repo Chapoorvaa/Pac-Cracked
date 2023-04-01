@@ -131,7 +131,7 @@ void llist_reverse(llist *list){
     list->head = prev;
 }
 
-void *llist_fetch(llist *list, size_t i){
+void *llist_use(llist *list, size_t i){
     struct Node *l = list->head;
     if (list->length <= i){
         return NULL;

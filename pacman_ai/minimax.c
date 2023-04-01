@@ -3,7 +3,7 @@
 #include "minimax.h"
 #include "lib/tree.h"
 #include "../main.h"
-#include <libc.h>
+#include <string.h>
 
 int *can_goto(Game *game){
 	int x = game->pacman->x;

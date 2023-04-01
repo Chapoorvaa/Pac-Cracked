@@ -1,7 +1,6 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "pacman_ai/search.h"
 #include "obj/ghost.h"
 #include "obj/player.h"
 #include "src/map.h"
@@ -17,6 +16,7 @@
 #define GAME_OVER -10000
 
 #define WALL '#'
+#define WALL2 '_'
 
 #define PEACEFULL 0
 #define EASY 2
