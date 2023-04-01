@@ -331,10 +331,10 @@ void ghostPathing(Ghost* ghost, Ghost* blinky, Map* map,
                         dpy = player->y;
                         break;
                 }
-                int blinkx = blinky->x;
-                int blinky = blinky->y;
-                ghost->targetX = 2 * dpx - blinkx;
-                ghost->targetY = 2 * dpy - blinky;
+                int blinkyx = blinky->x;
+                int blinkyy = blinky->y;
+                ghost->targetX = 2 * dpx - blinkyx;
+                ghost->targetY = 2 * dpy - blinkyy;
             }
             else if (strcmp(ghost->name, "clyde") == 0)
             {
