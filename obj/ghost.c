@@ -2,14 +2,13 @@
 #include <string.h>
 #include <stdlib.h>
 
-Ghost* ghostInit(char* label, int speed, int direction, int mode,
+Ghost* ghostInit(char* label, int direction, int mode,
  int scatterTargetX, int scatterTargetY, int spawnX, int spawnY)
 {
     Ghost* ghost = malloc(sizeof(Ghost));
     ghost->name = label;
     ghost->x = spawnX;
     ghost->y = spawnY;
-    ghost->speed = speed;
     ghost->direction = direction;
     ghost->mode = mode;
     ghost->targetX = spawnX;
@@ -41,15 +40,28 @@ void move(Ghost* ghost){
 }
 
 void GhostMove(Ghost* ghost, Map* map, struct Player* player){
+    // case where the ghost is still in the ghost house
+    if (map->grid[(ghost->y - 1) * COL + ghost->x] == WALL2){
+        ghost->y -= 1;
+        return;
+    }
+    if (map->grid[ghost->y * COL + ghost->x - 1] == WALL2){
+        ghost->x -= 1;
+        return;
+    }
     int nb_walls = 0;
     // check if 4 tiles around the ghost are walls
-    if (map->grid[(ghost->y - 1) * COL + ghost->x] == WALL)
+    if (map->grid[(ghost->y - 1) * COL + ghost->x] == WALL ||
+            map->grid[(ghost->y - 1) * COL + ghost->x] == WALL2)
         nb_walls++;
-    if (map->grid[(ghost->y + 1) * COL + ghost->x] == WALL)
+    if (map->grid[(ghost->y + 1) * COL + ghost->x] == WALL ||
+            map->grid[(ghost->y + 1) * COL + ghost->x] == WALL2)
         nb_walls++;
-    if (map->grid[ghost->y * COL + ghost->x - 1] == WALL)
+    if (map->grid[ghost->y * COL + ghost->x - 1] == WALL ||
+            map->grid[ghost->y * COL + ghost->x - 1] == WALL2)
         nb_walls++;
-    if (map->grid[ghost->y * COL + ghost->x + 1] == WALL)
+    if (map->grid[ghost->y * COL + ghost->x + 1] == WALL ||
+            map->grid[ghost->y * COL + ghost->x + 1] == WALL2)
         nb_walls++;
     // if there are 0/1 walls around the ghost then we can use pathing
     // This is basically saying that we are at an intersection

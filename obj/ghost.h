@@ -11,6 +11,7 @@
 #define ROW 29
 #define COL 27
 #define WALL '#'
+#define WALL2 '_'
 
 typedef enum GhostMode
 {
@@ -34,7 +35,6 @@ typedef struct Ghost
     char* name;
     int x;
     int y;
-    int speed;
     GhostDirection direction;
     GhostMode mode;
     int targetX;
@@ -45,21 +45,11 @@ typedef struct Ghost
     int spawnY;
 }Ghost;
 
-typedef struct Ghosts
-{
-    struct Ghost* blinky;
-    struct Ghost* pinky;
-    struct Ghost* inky;
-    struct Ghost* clyde;
-}Ghosts;
-
-
-
 // Ghost functions
 
 
 // Initialize a ghost
-Ghost* ghostInit(char* label, int speed, int direction, int mode, 
+Ghost* ghostInit(char* label, int direction, int mode, 
         int scatterTargetX, int scatterTargetY, int spawnX, int spawnY);
 
 // Moves the ghost and checks for collisions + intersections with the map

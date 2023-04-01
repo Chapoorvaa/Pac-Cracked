@@ -14,8 +14,31 @@ llist* init_ghosts(int difficulty){
     // if difficulty is easy init 2 ghosts
     // if hard init 4
     // peacefull init 0 
-	llist *ghosts;
-	return ghosts;
+    llist *ghosts;
+    init_llist(ghosts);
+    if (difficulty == PEACEFULL){
+        return ghosts;
+    }
+    // The coords (13, 13) should be the coords just under the door of the ghost
+    // house
+    else if (difficulty == EASY){
+        Ghost* blinky = ghostInit("blinky", left, SCATTER, ROW, 0, 13, 13);
+        Ghost* clyde = ghostInit("clyde", left, SCATTER, 0, COL, 13, 13);
+        llist_append(ghosts, blinky);
+        llist_append(ghosts, clyde);
+        return ghosts;
+    }
+    else{
+        Ghost* blinky = ghostInit("blinky", left, SCATTER, ROW, 0, 13, 13);
+        Ghost* clyde = ghostInit("clyde", left, SCATTER, 0, COL, 13, 13);
+        Ghost* inky = ghostInit("inky", right, SCATTER, 0, 0, 13, 13);
+        Ghost* pinky = ghostInit("pinky", right, SCATTER, ROW, COL, 13, 13);
+        llist_append(ghosts, blinky);
+        llist_append(ghosts, clyde);
+        llist_append(ghosts, inky);
+        llist_append(ghosts, pinky);
+        return ghosts;
+    }
 }
 
 Game *init_game(int is_ai, int difficulty, int map_load){
