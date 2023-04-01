@@ -53,7 +53,7 @@ Ghost* ghostInit(char* label, int direction, int mode,
         int scatterTargetX, int scatterTargetY, int spawnX, int spawnY);
 
 // Moves the ghost and checks for collisions + intersections with the map
-void GhostMove(Ghost* ghost, Map* map, struct Player* player);
+void GhostMove(Ghost* ghost, Ghost* blinky, Map* map, struct Player* player);
 
 // Just moves the ghost (however no checks are made)
 void move(Ghost* ghost);

@@ -132,7 +132,7 @@ void checkWall(Ghost* ghost, Map* map){
     }
 }
 
-void ghostPathing(Ghost* ghost, Ghost* blinky Map* map, 
+void ghostPathing(Ghost* ghost, Ghost* blinky, Map* map, 
         Player* player, int nb_walls)
 {
     // Depending on the ghost mode, and knowing that the ghost is at an
