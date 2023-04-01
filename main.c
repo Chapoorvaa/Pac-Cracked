@@ -138,7 +138,7 @@ int main(){
 		        	game->pacman = ga->pacman;  
                     break;
             }
-            for (int i = 0; i < ghosts; i++){
+            for (int i = 0; i < ghosts->length; i++){
                 GhostMove(llist_use(ghosts, i), game->map, game->pacman);
             }
             update(game);
