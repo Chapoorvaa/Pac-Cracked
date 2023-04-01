@@ -64,6 +64,8 @@ void checkWall(Ghost* ghost, Map* map);
 // When the ghost is at an intersection with 0 or 1 adjacent walls 
 // recalculate the target of the ghost
 // depending on the mode
-void ghostPathing(Ghost* ghost, Map* map, struct Player* player, int nb_walls);
+// There is a need to input blinky for inky's target calulation in CHASE mode
+void ghostPathing(Ghost* ghost, Ghost* blinky, Map* map, 
+        Player* player, int nb_walls);
 
 #endif

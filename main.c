@@ -10,7 +10,6 @@
 #include "pacman_ai/search.h"
 
 llist* init_ghosts(int difficulty){
-	//TODO
     // if difficulty is easy init 2 ghosts
     // if hard init 4
     // peacefull init 0 

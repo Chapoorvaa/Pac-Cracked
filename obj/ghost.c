@@ -39,7 +39,7 @@ void move(Ghost* ghost){
     }
 }
 
-void GhostMove(Ghost* ghost, Map* map, struct Player* player){
+void GhostMove(Ghost* ghost, Ghost* blinky, Map* map, struct Player* player){
     // case where the ghost is still in the ghost house
     if (map->grid[(ghost->y - 1) * COL + ghost->x] == WALL2){
         ghost->y -= 1;
@@ -66,7 +66,7 @@ void GhostMove(Ghost* ghost, Map* map, struct Player* player){
     // if there are 0/1 walls around the ghost then we can use pathing
     // This is basically saying that we are at an intersection
     if (nb_walls < 1)
-        ghostPathing(ghost, map, player, nb_walls);
+        ghostPathing(ghost, blinky, map, player, nb_walls);
     else
         checkWall(ghost, map);
     move(ghost);
@@ -132,7 +132,8 @@ void checkWall(Ghost* ghost, Map* map){
     }
 }
 
-void ghostPathing(Ghost* ghost, Map* map, struct Player* player, int nb_walls)
+void ghostPathing(Ghost* ghost, Ghost* blinky Map* map, 
+        Player* player, int nb_walls)
 {
     // Depending on the ghost mode, and knowing that the ghost is at an
     // intersection, then choose the direction of the ghost
@@ -330,8 +331,8 @@ void ghostPathing(Ghost* ghost, Map* map, struct Player* player, int nb_walls)
                         dpy = player->y;
                         break;
                 }
-                int blinkx = ghost->x;
-                int blinky = ghost->y;
+                int blinkx = blinky->x;
+                int blinky = blinky->y;
                 ghost->targetX = 2 * dpx - blinkx;
                 ghost->targetY = 2 * dpy - blinky;
             }
