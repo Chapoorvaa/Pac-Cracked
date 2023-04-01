@@ -13,8 +13,7 @@ llist* init_ghosts(int difficulty){
     // if difficulty is easy init 2 ghosts
     // if hard init 4
     // peacefull init 0 
-    llist *ghosts;
-    init_llist(ghosts);
+    llist *ghosts = llist_init();
     if (difficulty == PEACEFULL){
         return ghosts;
     }
@@ -162,7 +161,8 @@ int main(){
                     break;
             }
             for (size_t i = 0; i < ghosts->length; i++){
-                GhostMove(llist_use(ghosts, i), game->map, game->pacman);
+                GhostMove(llist_use(ghosts, i), llist_use(ghosts, 0),
+                        game->map, game->pacman);
             }
             update(game);
 		}
