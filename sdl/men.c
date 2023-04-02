@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <unistd.h>
 
 #define STACK_MAX 10
 
@@ -225,20 +226,21 @@ void draw_play_mode(SDL_Renderer* renderer)
             // Check if Play button was clicked
             if (x >= easy_x && x <= easy_x + BUTTON_WIDTH &&
                 y >= easy_y && y <= easy_y + BUTTON_HEIGHT) {
-                // Handle Play button click 
+                // Handle easy button click 
             }
             else if (x >= medium_x && x <= medium_x + BUTTON_WIDTH &&
             y >= medium_y && y <= medium_y + BUTTON_HEIGHT) {
-            // Handle Select Map button click
+            // Handle medium button click
             }
             else if (x >= hard_x && x <= hard_x + BUTTON_WIDTH &&
             y >= hard_y && y <= hard_y + BUTTON_HEIGHT) {
-                // Handle High Score button click
+                // Handle hard button click
             }
             else if (x >= back_x && x <= back_x + BUTTON_WIDTH &&
             y >= back_y && y <= back_y + BUTTON_HEIGHT)
             {   
                 return_to_previous_screen(renderer);
+                sleep(0.2);
                 draw_menu(renderer);
             }   
         }
@@ -298,6 +300,7 @@ void draw_help(SDL_Renderer* renderer)
             y >= back_y && y <= back_y + 60)
             {   
                 return_to_previous_screen(renderer);
+                sleep(0.2);
                 draw_menu(renderer);
             }   
         }
@@ -350,6 +353,7 @@ void draw_about(SDL_Renderer* renderer)
             y >= back_y && y <= back_y + 60)
             {   
                 return_to_previous_screen(renderer);
+                sleep(0.2);
                 draw_menu(renderer);
             }   
         }
