@@ -33,6 +33,16 @@ SDL_Texture* pop_screen() {
     }
 }
 
+void return_to_previous_screen(SDL_Renderer* renderer) {
+    SDL_Texture* previous_screen = pop_screen();
+    if (previous_screen != NULL) {
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, previous_screen, NULL, NULL);
+        SDL_RenderPresent(renderer);
+        SDL_DestroyTexture(previous_screen);
+    }
+}
+
 
 int window_width, window_height;
 int image_width, image_height;
@@ -202,6 +212,38 @@ void draw_play_mode(SDL_Renderer* renderer)
     SDL_RenderPresent(renderer);
     push_screen(dif_texture);
 
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)) {
+        
+        if (event.type == SDL_QUIT) {
+            break;
+        } 
+        else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            int x = event.button.x;
+            int y = event.button.y;
+    
+            // Check if Play button was clicked
+            if (x >= easy_x && x <= easy_x + BUTTON_WIDTH &&
+                y >= easy_y && y <= easy_y + BUTTON_HEIGHT) {
+                // Handle Play button click 
+            }
+            else if (x >= medium_x && x <= medium_x + BUTTON_WIDTH &&
+            y >= medium_y && y <= medium_y + BUTTON_HEIGHT) {
+            // Handle Select Map button click
+            }
+            else if (x >= hard_x && x <= hard_x + BUTTON_WIDTH &&
+            y >= hard_y && y <= hard_y + BUTTON_HEIGHT) {
+                // Handle High Score button click
+            }
+            else if (x >= back_x && x <= back_x + BUTTON_WIDTH &&
+            y >= back_y && y <= back_y + BUTTON_HEIGHT)
+            {   
+                return_to_previous_screen(renderer);
+                draw_menu(renderer);
+            }   
+        }
+    }
+
     SDL_DestroyTexture(easy_texture);
     SDL_DestroyTexture(medium_texture);
     SDL_DestroyTexture(hard_texture);
@@ -210,15 +252,6 @@ void draw_play_mode(SDL_Renderer* renderer)
 
 }
 
-void return_to_previous_screen(SDL_Renderer* renderer) {
-    SDL_Texture* previous_screen = pop_screen();
-    if (previous_screen != NULL) {
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, previous_screen, NULL, NULL);
-        SDL_RenderPresent(renderer);
-        SDL_DestroyTexture(previous_screen);
-    }
-}
 
 void draw_help(SDL_Renderer* renderer)
 {
@@ -251,6 +284,76 @@ void draw_help(SDL_Renderer* renderer)
     SDL_RenderCopy(renderer, back_texture, NULL, &(SDL_Rect){back_x, back_y, back_width, back_height});
     SDL_RenderPresent(renderer);
     push_screen(help1_texture);
+
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)) {
+        
+        if (event.type == SDL_QUIT) {
+            break;
+        } 
+        else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            int x = event.button.x;
+            int y = event.button.y;
+            if (x >= back_x && x <= back_x + 300 &&
+            y >= back_y && y <= back_y + 60)
+            {   
+                return_to_previous_screen(renderer);
+                draw_menu(renderer);
+            }   
+        }
+    }
+
+}
+
+void draw_about(SDL_Renderer* renderer)
+{
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer,11,63,114,255);
+    SDL_Surface* about1_surface = IMG_Load("about.png");
+    SDL_Texture* about1_texture = SDL_CreateTextureFromSurface(renderer, about1_surface);
+    SDL_FreeSurface(about1_surface);
+
+
+    SDL_Surface* back_surface = IMG_Load("back.png");
+    SDL_Texture* back_texture = SDL_CreateTextureFromSurface(renderer, back_surface);
+    SDL_FreeSurface(back_surface);
+
+    int width, height;
+    SDL_GetRendererOutputSize(renderer, &width, &height);
+
+    int about1_width, about1_height;
+    SDL_QueryTexture(about1_texture, NULL, NULL, &about1_width, &about1_height);
+
+    int back_width, back_height;
+    SDL_QueryTexture(back_texture, NULL, NULL, &back_width, &back_height);
+
+    int about1_x = (width - about1_width) / 2;
+    int about1_y = ((height - about1_height) / 2)-50;
+
+    int back_x = (width - back_width) / 2;
+    int back_y = ((height - back_height) / 2)*1.75;
+    SDL_RenderCopy(renderer, about1_texture, NULL, &(SDL_Rect){about1_x, about1_y, about1_width, about1_height});
+    SDL_RenderCopy(renderer, back_texture, NULL, &(SDL_Rect){back_x, back_y, back_width, back_height});
+    SDL_RenderPresent(renderer);
+    push_screen(about1_texture);
+
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)) {
+        
+        if (event.type == SDL_QUIT) {
+            break;
+        } 
+        else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            int x = event.button.x;
+            int y = event.button.y;
+            if (x >= back_x && x <= back_x + 300 &&
+            y >= back_y && y <= back_y + 60)
+            {   
+                return_to_previous_screen(renderer);
+                draw_menu(renderer);
+            }   
+        }
+    }
 
 }
 
@@ -303,38 +406,6 @@ int main() {
                 y >= play_y && y <= play_y + BUTTON_HEIGHT) {
                 // Handle Play button click
                 draw_play_mode(renderer);
-            
-                SDL_Event event;
-                while (SDL_WaitEvent(&event)) {
-                    
-                    if (event.type == SDL_QUIT) {
-                        break;
-                    } 
-                    else if (event.type == SDL_MOUSEBUTTONDOWN) {
-                        int x = event.button.x;
-                        int y = event.button.y;
-                
-                        // Check if Play button was clicked
-                        if (x >= easy_x && x <= easy_x + BUTTON_WIDTH &&
-                            y >= easy_y && y <= easy_y + BUTTON_HEIGHT) {
-                            // Handle Play button click 
-                        }
-                        else if (x >= medium_x && x <= medium_x + BUTTON_WIDTH &&
-                        y >= medium_y && y <= medium_y + BUTTON_HEIGHT) {
-                        // Handle Select Map button click
-                        }
-                        else if (x >= hard_x && x <= hard_x + BUTTON_WIDTH &&
-                        y >= hard_y && y <= hard_y + BUTTON_HEIGHT) {
-                            // Handle High Score button click
-                        }
-                        else if (x >= back_x && x <= back_x + BUTTON_WIDTH &&
-                        y >= back_y && y <= back_y + BUTTON_HEIGHT)
-                        {   
-                            return_to_previous_screen(renderer);
-                            draw_menu(renderer);
-                        }   
-                    }
-                }
             }
 
             else if (x >= select_map_x && x <= select_map_x + BUTTON_WIDTH &&
@@ -349,27 +420,10 @@ int main() {
              y >= help_y && y <= help_y + BUTTON_HEIGHT) {
                 // Handle Help button click
                 draw_help(renderer);
-                SDL_Event event;
-                while (SDL_WaitEvent(&event)) {
-                    
-                    if (event.type == SDL_QUIT) {
-                        break;
-                    } 
-                    else if (event.type == SDL_MOUSEBUTTONDOWN) {
-                        int x = event.button.x;
-                        int y = event.button.y;
-                        if (x >= back_x && x <= back_x + 300 &&
-                        y >= back_y && y <= back_y + 60)
-                        {   
-                            return_to_previous_screen(renderer);
-                            draw_menu(renderer);
-                        }   
-                    }
-                    }
             }
             else if (x >= about_x && x <= about_x + BUTTON_WIDTH &&
              y >= about_y && y <= about_y + BUTTON_HEIGHT) {
-                // Handle About button click
+                draw_about(renderer);
             }
             else if (x >= quit_x && x <= quit_x + BUTTON_WIDTH &&
              y >= quit_y && y <= quit_y + BUTTON_HEIGHT) {
