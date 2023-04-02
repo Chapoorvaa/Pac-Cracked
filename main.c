@@ -85,7 +85,7 @@ void update(Game* game){
     // check each entities direction and update x and y values accordingly
 	int x = game->pacman->x;
 	int y = game->pacman->y;
-	int pac_location = y * ROW + x;
+	int pac_location = y * COL + x;
 	pac_location += game->pacman->direction;
 	game->pacman->x = pac_location % COL;
 	game->pacman->y = pac_location / COL;
