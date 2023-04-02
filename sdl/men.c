@@ -3,6 +3,36 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+#define STACK_MAX 10
+
+typedef struct {
+    SDL_Texture* data[STACK_MAX];
+    int size;
+} Stack;
+
+Stack screen_stack;
+
+void init_stack() {
+    screen_stack.size = 0;
+}
+
+void push_screen(SDL_Texture* screen) {
+    if (screen_stack.size < STACK_MAX) {
+        screen_stack.data[screen_stack.size++] = screen;
+    } else {
+        printf("Stack overflow\n");
+    }
+}
+
+SDL_Texture* pop_screen() {
+    if (screen_stack.size > 0) {
+        return screen_stack.data[--screen_stack.size];
+    } else {
+        printf("Stack underflow\n");
+        return NULL;
+    }
+}
+
 
 int window_width, window_height;
 int image_width, image_height;
@@ -95,6 +125,7 @@ void draw_menu(SDL_Renderer* renderer)
     SDL_RenderCopy(renderer, quit_texture, NULL, &quit_rect);
 
     SDL_RenderPresent(renderer);
+    push_screen(menu_texture);
 
     SDL_DestroyTexture(menu_texture);
     SDL_DestroyTexture(play_texture);
@@ -126,7 +157,7 @@ void draw_play_mode(SDL_Renderer* renderer)
     SDL_Texture* hard_texture = SDL_CreateTextureFromSurface(renderer, hard_surface);
     SDL_FreeSurface(hard_surface);
 
-    SDL_Surface* back_surface = IMG_Load("play_mode/hard.png"); ////to modify
+    SDL_Surface* back_surface = IMG_Load("back.png");
     SDL_Texture* back_texture = SDL_CreateTextureFromSurface(renderer, back_surface);
     SDL_FreeSurface(back_surface);
 
@@ -153,8 +184,9 @@ void draw_play_mode(SDL_Renderer* renderer)
     hard_x = easy_x;
     hard_y = medium_y + BUTTON_HEIGHT + BUTTON_MARGIN;
 
+    
     back_x = easy_x;
-    back_y = hard_y + BUTTON_HEIGHT + (BUTTON_MARGIN*2);
+    back_y = hard_y + BUTTON_HEIGHT + (BUTTON_MARGIN*3);
 
     SDL_RenderCopy(renderer, dif_texture, NULL, &dif_rect);
 
@@ -164,14 +196,61 @@ void draw_play_mode(SDL_Renderer* renderer)
     SDL_RenderCopy(renderer, medium_texture, NULL, &medium_rect);
     SDL_Rect hard_rect = { hard_x, hard_y, BUTTON_WIDTH, BUTTON_HEIGHT };
     SDL_RenderCopy(renderer, hard_texture, NULL, &hard_rect);
+    SDL_Rect back_rect = { back_x, back_y, BUTTON_WIDTH, BUTTON_HEIGHT };
+    SDL_RenderCopy(renderer, back_texture, NULL, &back_rect);
 
     SDL_RenderPresent(renderer);
+    push_screen(dif_texture);
 
     SDL_DestroyTexture(easy_texture);
     SDL_DestroyTexture(medium_texture);
     SDL_DestroyTexture(hard_texture);
     SDL_DestroyTexture(dif_texture);
     SDL_DestroyTexture(back_texture);
+
+}
+
+void return_to_previous_screen(SDL_Renderer* renderer) {
+    SDL_Texture* previous_screen = pop_screen();
+    if (previous_screen != NULL) {
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, previous_screen, NULL, NULL);
+        SDL_RenderPresent(renderer);
+        SDL_DestroyTexture(previous_screen);
+    }
+}
+
+void draw_help(SDL_Renderer* renderer)
+{
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer,11,63,114,255);
+    SDL_Surface* help1_surface = IMG_Load("help.png");
+    SDL_Texture* help1_texture = SDL_CreateTextureFromSurface(renderer, help1_surface);
+    SDL_FreeSurface(help1_surface);
+
+
+    SDL_Surface* back_surface = IMG_Load("back.png");
+    SDL_Texture* back_texture = SDL_CreateTextureFromSurface(renderer, back_surface);
+    SDL_FreeSurface(back_surface);
+
+    int width, height;
+    SDL_GetRendererOutputSize(renderer, &width, &height);
+
+    int help1_width, help1_height;
+    SDL_QueryTexture(help1_texture, NULL, NULL, &help1_width, &help1_height);
+
+    int back_width, back_height;
+    SDL_QueryTexture(back_texture, NULL, NULL, &back_width, &back_height);
+
+    int help1_x = (width - help1_width) / 2;
+    int help1_y = ((height - help1_height) / 2)-50;
+
+    int back_x = (width - back_width) / 2;
+    int back_y = ((height - back_height) / 2)*1.75;
+    SDL_RenderCopy(renderer, help1_texture, NULL, &(SDL_Rect){help1_x, help1_y, help1_width, help1_height});
+    SDL_RenderCopy(renderer, back_texture, NULL, &(SDL_Rect){back_x, back_y, back_width, back_height});
+    SDL_RenderPresent(renderer);
+    push_screen(help1_texture);
 
 }
 
@@ -203,10 +282,12 @@ int main() {
     
     SDL_GetWindowSize(window, &window_width, &window_height);
     
+    init_stack();
     draw_menu(renderer);
 
     // Wait for the user to quit
     SDL_Event event;
+
     while (SDL_WaitEvent(&event)) {
         
         if (event.type == SDL_QUIT) {
@@ -241,7 +322,6 @@ int main() {
                         else if (x >= medium_x && x <= medium_x + BUTTON_WIDTH &&
                         y >= medium_y && y <= medium_y + BUTTON_HEIGHT) {
                         // Handle Select Map button click
-                            draw_menu(renderer);
                         }
                         else if (x >= hard_x && x <= hard_x + BUTTON_WIDTH &&
                         y >= hard_y && y <= hard_y + BUTTON_HEIGHT) {
@@ -249,9 +329,10 @@ int main() {
                         }
                         else if (x >= back_x && x <= back_x + BUTTON_WIDTH &&
                         y >= back_y && y <= back_y + BUTTON_HEIGHT)
-                        {
+                        {   
+                            return_to_previous_screen(renderer);
                             draw_menu(renderer);
-                        }
+                        }   
                     }
                 }
             }
@@ -267,6 +348,24 @@ int main() {
             else if (x >= help_x && x <= help_x + BUTTON_WIDTH &&
              y >= help_y && y <= help_y + BUTTON_HEIGHT) {
                 // Handle Help button click
+                draw_help(renderer);
+                SDL_Event event;
+                while (SDL_WaitEvent(&event)) {
+                    
+                    if (event.type == SDL_QUIT) {
+                        break;
+                    } 
+                    else if (event.type == SDL_MOUSEBUTTONDOWN) {
+                        int x = event.button.x;
+                        int y = event.button.y;
+                        if (x >= back_x && x <= back_x + 300 &&
+                        y >= back_y && y <= back_y + 60)
+                        {   
+                            return_to_previous_screen(renderer);
+                            draw_menu(renderer);
+                        }   
+                    }
+                    }
             }
             else if (x >= about_x && x <= about_x + BUTTON_WIDTH &&
              y >= about_y && y <= about_y + BUTTON_HEIGHT) {
@@ -278,6 +377,7 @@ int main() {
             }
         }
     }
+    
     // Clean up
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

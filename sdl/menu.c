@@ -182,6 +182,10 @@ int main() {
                 SDL_Texture* hard_texture = SDL_CreateTextureFromSurface(renderer, hard_surface);
                 SDL_FreeSurface(hard_surface);
 
+                SDL_Surface* back_surface = IMG_Load("back.png");
+                SDL_Texture* back_texture = SDL_CreateTextureFromSurface(renderer, back_surface);
+                SDL_FreeSurface(back_surface);
+
                 int image_width, image_height;
                 SDL_QueryTexture(dif_texture, NULL, NULL, &image_width, &image_height);
 
@@ -205,6 +209,9 @@ int main() {
                 int hard_x = easy_x;
                 int hard_y = medium_y + BUTTON_HEIGHT + BUTTON_MARGIN;
 
+                int back_x = easy_x;
+                int back_y = hard_y + BUTTON_HEIGHT + (BUTTON_MARGIN*3);
+
                 SDL_RenderCopy(renderer, dif_texture, NULL, &dif_rect);
 
                 SDL_Rect easy_rect = { easy_x, easy_y, BUTTON_WIDTH, BUTTON_HEIGHT };
@@ -213,6 +220,8 @@ int main() {
                 SDL_RenderCopy(renderer, medium_texture, NULL, &medium_rect);
                 SDL_Rect hard_rect = { hard_x, hard_y, BUTTON_WIDTH, BUTTON_HEIGHT };
                 SDL_RenderCopy(renderer, hard_texture, NULL, &hard_rect);
+                SDL_Rect back_rect = { back_x, back_y, BUTTON_WIDTH, BUTTON_HEIGHT };
+                SDL_RenderCopy(renderer, back_texture, NULL, &back_rect);
 
                 SDL_RenderPresent(renderer);
 
@@ -237,6 +246,10 @@ int main() {
                         else if (x >= medium_x && x <= medium_x + BUTTON_WIDTH &&
                         y >= medium_y && y <= medium_y + BUTTON_HEIGHT) {
                         // Handle Select Map button click
+                        }
+                        else if (x >= hard_x && x <= hard_x + BUTTON_WIDTH &&
+                        y >= hard_y && y <= hard_y + BUTTON_HEIGHT) {
+                            // Handle High Score button click
                         }
                         else if (x >= hard_x && x <= hard_x + BUTTON_WIDTH &&
                         y >= hard_y && y <= hard_y + BUTTON_HEIGHT) {
