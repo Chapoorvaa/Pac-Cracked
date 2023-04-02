@@ -5,8 +5,8 @@
 
 #include <stddef.h>
 
-#define SPAWN_X 0
-#define SPAWN_Y 0
+#define SPAWN_X 13
+#define SPAWN_Y 21
 
 #define UP -28
 #define DOWN 28

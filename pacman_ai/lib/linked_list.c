@@ -72,21 +72,14 @@ void llist_insert(llist *list, size_t i, void *data){
 }
 
 void *llist_fastpop(llist *list){
-    struct Node *l = list->head;
-    void *data;
-    if (list->head->next == NULL){
-        free(list->head->data);
-        free(list->head);
+    struct Node *n = list->head;
+    void *key = NULL;
+    while (n->next != NULL){
+        n = n->next;
     }
-    else{
-        while (l->next->next != NULL){
-            l = l->next;
-        }
-        data = l->next->data;
-        free(l->next);
-    }
-    list->length--;
-    return data;
+    key = n->data;
+    free(n);
+    return key;
 }
 
 void *llist_pop(llist *list, size_t i){

@@ -8,4 +8,5 @@
 // in the stack
 int bfs(Game *game);
 
+int closest(Game *game);
 #endif

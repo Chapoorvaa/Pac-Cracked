@@ -3,8 +3,7 @@
 #include <stdlib.h>
 
 void init_gtree(gtree *tree){
-    llist *children;
-    init_llist(children);
+    llist *children = init_llist();
     tree = malloc(sizeof(gtree));
     tree->children = children;
 }

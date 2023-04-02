@@ -8,7 +8,7 @@
 
 Map *init_map(){
 	Map *map = malloc(sizeof(Map));
-	map->grid = calloc(ROW * COL, sizeof(char));
+	map->grid = malloc(ROW * COL * sizeof(char));
 	map->points = 0;
 	return map;
 }
@@ -38,12 +38,14 @@ void save_map(Map* map, char* name){
 	fclose(f);
 }
 
-void print_map(Map* map) 
-{
-	for (int i = 0; i < ROW; i++) {
-		for (int j = 0; j < COL; j++) {
-			printf("%c", map->grid[i * ROW + j]);
-		}
-		printf("\n");
-	}
+void print_map(Map* map, Player* pacman) {
+    char* grid = map->grid;
+    grid[pacman->x + pacman->y * COL] = 'P';
+	for (int i = 0; i < ROW * COL; i++){
+        if (i % COL == 0){
+            printf("\n");
+        }
+        putchar(grid[i]);
+    }
+    printf("\n");
 }

@@ -21,6 +21,8 @@ enum Rewards {
     eat_ghost = 20,
 };
 
+int *can_goto(Game *game);
+
 gtree *create_tree(Game *game, int depth);
 
 void update_tree(Game *game, gtree *tree);

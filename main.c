@@ -9,11 +9,13 @@
 #include <unistd.h>
 #include "pacman_ai/search.h"
 
+char DEFAULT_MAP[] = {"############################............#............##.####.#####.#.#####.####.##o####.#####.#.#####.####o##.####.#####.#.#####.####.##.........................##.####.##.#######.##.####.##.####.##.#######.##.####.##......##....#....##......#######.##### # #####.######     #.##### # #####.#          #.##         ##.#          #.## ###_### ##.#          #.   #     #   .#          #.## ####### ##.#          #.##         ##.#          #.## ####### ##.#     ######.## ####### ##.#######............#............##.####.#####.#.#####.####.##.####.#####.#.#####.####.##o..##...............##..o####.##.##.#######.##.##.######.##.##.#######.##.##.####......##....#....##......##.##########.#.##########.##.##########.#.##########.##.........................############################"};
+
 llist* init_ghosts(int difficulty){
     // if difficulty is easy init 2 ghosts
     // if hard init 4
     // peacefull init 0 
-    llist *ghosts = llist_init();
+    llist *ghosts = init_llist();
     if (difficulty == PEACEFULL){
         return ghosts;
     }
@@ -43,8 +45,15 @@ Game *init_game(int is_ai, int difficulty, int map_load){
     Game *game;
     game = malloc(sizeof(Game));
     game->difficulty = difficulty;
-    if (map_load != 1){
-        game->map = load_map("./maps/map_1.txt");
+    if (map_load != 0){
+        //game->map = load_map("./maps/map_1.txt");
+        Map *map = malloc(sizeof(Map));
+        map->grid = malloc(sizeof(char) * (ROW * COL));
+        map->points = 0;
+        for(size_t i = 0; i < ROW * COL; i++){
+            map->grid[i] = DEFAULT_MAP[i];
+        }
+        game->map = map;
     }
     else{
         game->map = init_map();
@@ -77,14 +86,12 @@ void update(Game* game){
 	int x = game->pacman->x;
 	int y = game->pacman->y;
 	int pac_location = y * ROW + x;
-	if (game->map->grid[pac_location + game->pacman->direction] != WALL){
-		pac_location += game->pacman->direction;
-		game->pacman->x = pac_location % ROW;
-		game->pacman->y = pac_location / ROW;
-	}
+	pac_location += game->pacman->direction;
+	game->pacman->x = pac_location % COL;
+	game->pacman->y = pac_location / COL;
 	for (size_t i = 0; i < game->ghosts->length; i++){
 		Ghost *ghost = llist_use(game->ghosts, i);
-		int ghost_location = ghost->x + ROW * ghost->y;
+		int ghost_location = ghost->x + COL * ghost->y;
 		// check if pacman and ghost overlap and do what is needed
 		if (ghost_location == pac_location){
 			if (ghost->mode == SCATTER || ghost->mode == CHASE){
@@ -116,6 +123,19 @@ void update(Game* game){
 	game->round++;
 }
 
+int all_eaten(Game *game){
+    int f = 0;
+    int i = 0;
+    while (i < ROW * COL && f != 1){
+        char c = game->map->grid[i];
+        if (c == '.' || c == 'o'){
+            f = 1;
+        }
+        i++;
+    }
+    return f;
+}
+
 int main(){
     // - Launch the SDL Interface
     // - On Play Button Click
@@ -124,30 +144,36 @@ int main(){
     // - Load gameplay loop:
     //   .Generate / Load map
     //   .Init player and ghosts
-	int is_ai = 0;
+	int is_ai = 1;
 	int difficulty = 0;
-	int map_load = 0;
+	int map_load = 1;
+    printf("Initiating game...\n");
 	Game* game = init_game(is_ai, difficulty, map_load);
-	gtree* minimax_tree;
-    llist *ghosts = init_ghosts(difficulty);
-	if (game->is_ai == 1){
+	gtree* minimax_tree = NULL;
+    printf("Initiating extra assets...\n");
+	if (game->is_ai == 1 && difficulty > 0){
 		minimax_tree = create_tree(game, 6);
 	}
-	while (game_over(game) == 0){
+    printf("Starting game...\n");
+	while (game_over(game) == 0 && all_eaten(game) == 1){
     //   .Start Gameplay loop (while not_won):
     //      _Print Board
-		print_map(game->map);
+        printf("Score: %d\n", game->map->points);
+        print_map(game->map, game->pacman);
+		fflush(stdout);
     //      _Update Ghost Direction
     //      _Update Pacman Direction
     //      _Update location
     //      _Update Score
+        printf("Updating game state...\n");
 		if (game->is_ai != 1){
 			update(game);
 		}
 		else{
             switch (game->difficulty) {
                 case PEACEFULL:
-                    game->pacman->direction = bfs(game);
+                    game->pacman->direction = closest(game);
+                    printf("%d", game->pacman->direction);
                     break;
                 case EASY:
 			        minimax_tree = minimax(minimax_tree);
@@ -160,18 +186,19 @@ int main(){
 		        	game->pacman = ga->pacman;  
                     break;
             }
-            for (size_t i = 0; i < ghosts->length; i++){
-                GhostMove(llist_use(ghosts, i), llist_use(ghosts, 0),
+            for (size_t i = 0; i < game->ghosts->length; i++){
+                GhostMove(llist_use(game->ghosts, i), llist_use(game->ghosts, 0),
                         game->map, game->pacman);
             }
             update(game);
 		}
-		// Force prints to stdout
-		fflush(stdout);
 		// Makes loop sleep for 1s
 		sleep(1);
 	}
-	free_minimax(minimax_tree);
+    printf("Game over...\n");
+    if (minimax_tree != NULL){
+	    free_minimax(minimax_tree);
+    }
     // - When game done ask if player wants to save map
 	// - Ask for save file name TODO
 	char name[128];
