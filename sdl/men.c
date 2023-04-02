@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <unistd.h>
+//#include "play.h"
 
 #define STACK_MAX 10
 
@@ -57,6 +58,7 @@ int BUTTON_MARGIN;
 
 void draw_menu(SDL_Renderer* renderer)
 {
+    SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer,11,63,114,255);
     SDL_Surface* menu_surface = IMG_Load("logo.png");
     SDL_Texture* menu_texture = SDL_CreateTextureFromSurface(renderer, menu_surface);
@@ -227,14 +229,17 @@ void draw_play_mode(SDL_Renderer* renderer)
             if (x >= easy_x && x <= easy_x + BUTTON_WIDTH &&
                 y >= easy_y && y <= easy_y + BUTTON_HEIGHT) {
                 // Handle easy button click 
+                //play(renderer);
             }
             else if (x >= medium_x && x <= medium_x + BUTTON_WIDTH &&
             y >= medium_y && y <= medium_y + BUTTON_HEIGHT) {
             // Handle medium button click
+                //play(renderer);
             }
             else if (x >= hard_x && x <= hard_x + BUTTON_WIDTH &&
             y >= hard_y && y <= hard_y + BUTTON_HEIGHT) {
                 // Handle hard button click
+                //play(renderer);
             }
             else if (x >= back_x && x <= back_x + BUTTON_WIDTH &&
             y >= back_y && y <= back_y + BUTTON_HEIGHT)
@@ -392,11 +397,13 @@ int main() {
     init_stack();
     draw_menu(renderer);
 
+    int continuer = 1;
+
     // Wait for the user to quit
     SDL_Event event;
 
-    while (SDL_WaitEvent(&event)) {
-        
+    while (continuer) {
+        SDL_WaitEvent(&event);
         if (event.type == SDL_QUIT) {
             break;
         } 
@@ -435,6 +442,7 @@ int main() {
             }
         }
     }
+    
     
     // Clean up
     SDL_DestroyRenderer(renderer);

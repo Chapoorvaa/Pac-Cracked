@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+/*
 #define MAX_STACK_SIZE 10
 
 typedef struct {
@@ -32,7 +33,7 @@ Screen pop(Screen stack[], int* top) {
     Screen screen = stack[*top];
     (*top)--;
     return screen;
-}
+}*/
 
 int main() {
     // Initialize SDL
@@ -141,11 +142,12 @@ int main() {
     SDL_RenderCopy(renderer, quit_texture, NULL, &quit_rect);
 
     SDL_RenderPresent(renderer);
+    /*
     ScreenStack stack;
     initStack(&stack);
 
     // Push the menu screen onto the stack
-    pushScreen(&stack, menu_texture);
+    pushScreen(&stack, menu_texture);*/
 
     // Wait for the user to quit
     SDL_Event event;
