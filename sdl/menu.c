@@ -2,7 +2,37 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "play.h"
+
+#define MAX_STACK_SIZE 10
+
+typedef struct {
+    SDL_Texture* texture;
+    SDL_Rect rect;
+} Screen;
+
+Screen screen_stack[MAX_STACK_SIZE];
+int top = -1;
+
+void push(Screen stack[], int* top, Screen screen) {
+    if (*top == MAX_STACK_SIZE - 1) {
+        printf("Stack Overflow\n");
+        return;
+    }
+    (*top)++;
+    stack[*top] = screen;
+}
+
+Screen pop(Screen stack[], int* top) {
+    if (*top == -1) {
+        printf("Stack Underflow\n");
+        Screen empty_screen;
+        empty_screen.texture = NULL;
+        return empty_screen;
+    }
+    Screen screen = stack[*top];
+    (*top)--;
+    return screen;
+}
 
 int main() {
     // Initialize SDL
@@ -111,6 +141,11 @@ int main() {
     SDL_RenderCopy(renderer, quit_texture, NULL, &quit_rect);
 
     SDL_RenderPresent(renderer);
+    ScreenStack stack;
+    initStack(&stack);
+
+    // Push the menu screen onto the stack
+    pushScreen(&stack, menu_texture);
 
     // Wait for the user to quit
     SDL_Event event;
