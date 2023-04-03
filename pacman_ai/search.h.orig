@@ -10,6 +10,8 @@ int bfs(Game *game);
 
 int closest(Game *game);
 
+<<<<<<< Updated upstream
+=======
 int searchdumb(Game *game);
-
+>>>>>>> Stashed changes
 #endif

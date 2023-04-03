@@ -40,7 +40,6 @@ void save_map(Map* map, char* name){
 	fclose(f);
 }
 
-
 void print_map(Map* map, Player* pacman, llist* ghosts) {
     char grid[ROW * COL];
     for (int i = 0; i < ROW * COL; i++){

@@ -136,7 +136,10 @@ int all_eaten(Game *game){
     return f;
 }
 
-int main(){
+int main(int argc, char** argv){
+    if (argc != 2){
+        exit(EXIT_FAILURE);
+    }
     // - Launch the SDL Interface
     // - On Play Button Click
     // - Select Difficulty and if want to load map
@@ -145,13 +148,13 @@ int main(){
     //   .Generate / Load map
     //   .Init player and ghosts
 	int is_ai = 1;
-	int difficulty = 0;
+	int difficulty = argv[1][0] - '0';
 	int map_load = 1;
     printf("Initiating game...\n");
 	Game* game = init_game(is_ai, difficulty, map_load);
 	gtree* minimax_tree = NULL;
     printf("Initiating extra assets...\n");
-	if (game->is_ai == 1 && difficulty > 0){
+	if (game->is_ai == 1 && difficulty > 2){
 		minimax_tree = create_tree(game, 6);
 	}
     printf("Starting game...\n");
@@ -159,7 +162,7 @@ int main(){
     //   .Start Gameplay loop (while not_won):
     //      _Print Board
         printf("Score: %d\n", game->map->points);
-        print_map(game->map, game->pacman);
+        print_map(game->map, game->pacman, game->ghosts);
 		fflush(stdout);
     //      _Update Ghost Direction
     //      _Update Pacman Direction
@@ -172,13 +175,11 @@ int main(){
 		else{
             switch (game->difficulty) {
                 case PEACEFULL:
-                    game->pacman->direction = closest(game);
+                    game->pacman->direction = searchdumb(game);
                     printf("%d", game->pacman->direction);
                     break;
                 case EASY:
-			        minimax_tree = minimax(minimax_tree);
-                    Game *g = minimax_tree->key;
-		        	game->pacman = g->pacman;                    
+                    game->pacman->direction = searchdumb(game);                   
                     break;
                 case HARD:
 			        minimax_tree = minimax(minimax_tree);

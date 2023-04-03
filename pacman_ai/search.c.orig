@@ -7,7 +7,10 @@
 #include <limits.h>
 #include "minimax.h"
 #include <stdio.h>
+<<<<<<< Updated upstream
+=======
 #include <math.h>
+>>>>>>> Stashed changes
 
 #define WALL '#'
 #define WALL2 '_'
@@ -76,7 +79,11 @@ int bfs(Game *game){
 int manhattandist(int x, int y, int i, int j){
     int a = abs(i - x);
     int b = abs(j - y);
+<<<<<<< Updated upstream
     return a + b;
+=======
+    return sqrt(a*a + b*b);
+>>>>>>> Stashed changes
 }
 
 int min(int* dst, int len){
@@ -118,16 +125,25 @@ int choose_dir(int dir, int* can_go){
 
 int closest(Game *game){
     int dst[ROW * COL];
+<<<<<<< Updated upstream
+    for (size_t j = 0; j < ROW; j++){
+        for (size_t i = 0; i < COL; i++){
+            if (game->map->grid[i] == '.' || game->map->grid[i] == 'o'){
+=======
     for (int j = 0; j < ROW; j++){
         for (int i = 0; i < COL; i++){
             if (game->map->grid[i + COL * j] == '.' || game->map->grid[i + COL * j] == 'o'){
+>>>>>>> Stashed changes
                 int x = game->pacman->x;
                 int y = game->pacman->y;
                 dst[i] = manhattandist(x, y, i, j);
             } 
             else{
-
+<<<<<<< Updated upstream
+                dst[i] = inf;
+=======
                 dst[i] = INT_MAX;
+>>>>>>> Stashed changes
             }
         }
     }
@@ -136,6 +152,8 @@ int closest(Game *game){
     int c = choose_dir(lowest, can_go);
     free(can_go);
     return c;
+<<<<<<< Updated upstream
+=======
 }
 
 
@@ -162,4 +180,5 @@ int searchdumb(Game* game){
     last_i = options[last_i];
     free(options);
     return last_i;
+>>>>>>> Stashed changes
 }
