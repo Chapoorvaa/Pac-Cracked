@@ -183,6 +183,8 @@ int main(int argc, char** argv){
 	int is_ai = argv[2][0] - '0';
 	int difficulty = argv[1][0] - '0';
 	int map_load = 1;
+    int ch = 0;
+    int prev_ch = 0;
     printf("Initiating game...\n");
 	Game* game = init_game(is_ai, difficulty, map_load);
 	gtree* minimax_tree = NULL;
