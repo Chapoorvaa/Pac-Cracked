@@ -118,7 +118,6 @@ void update(Game* game){
         game->map->grid[pac_location + game->pacman->direction] != WALL2){
         pac_location += game->pacman->direction;
     }
-	pac_location += game->pacman->direction;
 	game->pacman->x = pac_location % COL;
 	game->pacman->y = pac_location / COL;
 	for (size_t i = 0; i < game->ghosts->length; i++){
