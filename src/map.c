@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include "map.h"
 
@@ -39,7 +40,10 @@ void save_map(Map* map, char* name){
 }
 
 void print_map(Map* map, Player* pacman) {
-    char* grid = map->grid;
+    char grid[ROW * COL];
+    for (int i = 0; i < ROW * COL; i++){
+        grid[i] = map->grid[i];
+    }
     grid[pacman->x + pacman->y * COL] = 'P';
 	for (int i = 0; i < ROW * COL; i++){
         if (i % COL == 0){

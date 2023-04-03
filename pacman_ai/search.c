@@ -6,6 +6,7 @@
 #include "../src/map.h"
 #include <limits.h>
 #include "minimax.h"
+#include <stdio.h>
 
 #define WALL '#'
 #define WALL2 '_'
@@ -14,24 +15,21 @@
 #define NOT_VISITED -5
 #define VISITED 1
 
-void form_adjlist(int vertex, llist *adjlist){
-    int n = 0;
-    if (vertex % GRID_WIDTH + 1 < GRID_WIDTH){
-        n = vertex + 1;
-        llist_append(adjlist, &n);
+int *form_adjlist(int vertex, Map* map){
+    int* adj = calloc(4, sizeof(int));
+    if (map->grid[vertex + UP] != WALL && map->grid[vertex + UP] != WALL2){
+        adj[0] = UP;
     }
-    if (vertex % GRID_WIDTH - 1 >= 0){
-        n = vertex - 1;
-        llist_append(adjlist, &n);
+        if (map->grid[vertex + LEFT] != WALL && map->grid[vertex + LEFT] != WALL2){
+        adj[1] = LEFT;
     }
-    if (vertex + GRID_WIDTH < GRID_HEIGHT * GRID_WIDTH){
-        n = vertex + GRID_HEIGHT;
-        llist_append(adjlist, &n);
-    } 
-    if (vertex - GRID_WIDTH >= 0){
-        n = vertex - GRID_HEIGHT;
-        llist_append(adjlist, &n);
+    if (map->grid[vertex + DOWN] != WALL && map->grid[vertex + DOWN] != WALL2){
+        adj[2] = DOWN;
     }
+    if (map->grid[vertex + RIGHT] != WALL && map->grid[vertex + RIGHT] != WALL2){
+        adj[3] = RIGHT;
+    }
+    return adj;
 }
 
 int bfs(Game *game){
@@ -39,7 +37,6 @@ int bfs(Game *game){
     char *grid = game->map->grid;
     int src = game->pacman->y * ROW + game->pacman->x;
     llist_prepend(q, &src);
-    llist *adjlist = init_llist();
     int M[ROW * COL];
     for (int i = 0; i < ROW * COL; i++){
         M[i] = -2;
@@ -48,18 +45,22 @@ int bfs(Game *game){
     int not_found = -1;
     while ((q->length != 0) && (not_found == -1)){
         int *n = llist_fastpop(q);
-        form_adjlist(*n, adjlist);
-        for(size_t i = 0; i < adjlist->length; i++){
-            int *adj = llist_use(adjlist, i);
-            char k = grid[*adj];
-            if (k != ' '){
-                not_found = *adj;
+        int *adjlist = form_adjlist(*n, game->map);
+        for(size_t i = 0; i < 4; i++){
+            int adj = adjlist[i];
+            if (adj == 0){
+                continue;
             }
-            if (M[*adj] == -2){
-                M[*adj] = *n;
-                llist_prepend(q, adj);
+            char k = grid[adj];
+            if (k != ' '){
+                not_found = adj;
+            }
+            if (M[adj] == -2){
+                M[adj] = *n;
+                llist_prepend(q, &adj);
             }
         }
+        free(adjlist);
     }
     int dst = not_found;
     int dir = 0;
@@ -68,19 +69,12 @@ int bfs(Game *game){
         dst = M[dst];
     }
     llist_free(q);
-    llist_free(adjlist);
     return src - dir;
 }
 
 int manhattandist(int x, int y, int i, int j){
-    int a = x - i;
-    int b = y - j;
-    if (a < 0){
-        a = -a;
-    }
-    if (b < 0){
-        b = -b;
-    }
+    int a = abs(i - x);
+    int b = abs(j - y);
     return a + b;
 }
 
@@ -112,25 +106,28 @@ int choose_dir(int dir, int* can_go){
             }
         }
     }
+    printf("x:%d, y:%d\n", lowest % COL, lowest / COL);
     return can_go[lowest_i];
 }
 
 int closest(Game *game){
     int inf = INT_MAX;
     int dst[ROW * COL];
-    for (size_t i = 0; i < ROW * COL; i++){
-        if (game->map->grid[i] == '.' || game->map->grid[i] == 'o'){
-            int x = game->pacman->x;
-            int y = game->pacman->y;
-            int i = i % COL;
-            int j = j / COL;
-            dst[i] = manhattandist(x, y, i, j);
-        }
-        else{
-            dst[i] = inf;
+    for (size_t j = 0; j < ROW; j++){
+        for (size_t i = 0; i < COL; i++){
+            if (game->map->grid[i] == '.' || game->map->grid[i] == 'o'){
+                int x = game->pacman->x;
+                int y = game->pacman->y;
+                dst[i] = manhattandist(x, y, i, j);
+            } 
+            else{
+                dst[i] = inf;
+            }
         }
     }
     int lowest = min(dst, ROW * COL);
     int *can_go = can_goto(game);
-    return choose_dir(lowest, can_go);
+    int c = choose_dir(lowest, can_go);
+    free(can_go);
+    return c;
 }
