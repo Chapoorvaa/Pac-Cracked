@@ -46,11 +46,21 @@ void print_map(Map* map, Player* pacman, llist* ghosts) {
     for (int i = 0; i < ROW * COL; i++){
         grid[i] = map->grid[i];
     }
-    for(size_t i = 0; i < ghosts->length; i++){
-        Ghost* g = llist_use(ghosts, i);
-        grid[g->x + g->y * COL] = (char)('0' + i + 1);
-    }
-    grid[pacman->x + pacman->y * COL] = 'P';
+    for (size_t i = 0; i < ghosts->length; i++){
+        Ghost *ghost = llist_use(ghosts, i);
+        if (i == 0){
+            grid[ghost->x + ghost->y * COL] = 'b';
+        }
+        else if (i == 1){
+            grid[ghost->x + ghost->y * COL] = 'c';
+        }
+        else if (i == 2){
+            grid[ghost->x + ghost->y * COL] = 'i';
+        }
+        else if (i == 3){
+            grid[ghost->x + ghost->y * COL] = 'p';
+        }
+    }    grid[pacman->x + pacman->y * COL] = 'P';
 	for (int i = 0; i < ROW * COL; i++){
         if (i % COL == 0){
             printf("\n");

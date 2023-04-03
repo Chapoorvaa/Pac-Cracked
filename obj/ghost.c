@@ -1,6 +1,7 @@
 #include "ghost.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 Ghost* ghostInit(char* label, int direction, int mode,
  int scatterTargetX, int scatterTargetY, int spawnX, int spawnY)
@@ -11,8 +12,8 @@ Ghost* ghostInit(char* label, int direction, int mode,
     ghost->y = spawnY;
     ghost->direction = direction;
     ghost->mode = mode;
-    ghost->targetX = spawnX;
-    ghost->targetY = spawnY;
+    ghost->targetX = scatterTargetX;
+    ghost->targetY = scatterTargetY;
     ghost->scatterTargetX = scatterTargetX;
     ghost->scatterTargetY = scatterTargetY;
     ghost->spawnX = spawnX;
@@ -39,100 +40,102 @@ void move(Ghost* ghost){
     }
 }
 
-void GhostMove(Ghost* ghost, Ghost* blinky, Map* map, struct Player* player){
+void GhostMove(Ghost* ghost, Ghost* blinky, char* map, struct Player* player){
     // case where the ghost is still in the ghost house
-    if (map->grid[(ghost->y - 1) * COL + ghost->x] == WALL2){
+    if (map[(ghost->y - 1) * COL + ghost->x] == WALL2){
         ghost->y -= 1;
         return;
     }
-    if (map->grid[ghost->y * COL + ghost->x - 1] == WALL2){
-        ghost->x -= 1;
+    if (map[ghost->y * COL + ghost->x] == WALL2){
+        ghost->y -= 1;
         return;
     }
     int nb_walls = 0;
     // check if 4 tiles around the ghost are walls
-    if (map->grid[(ghost->y - 1) * COL + ghost->x] == WALL ||
-            map->grid[(ghost->y - 1) * COL + ghost->x] == WALL2)
+    if (map[(ghost->y - 1) * COL + ghost->x] == WALL ||
+            map[(ghost->y - 1) * COL + ghost->x] == WALL2)
         nb_walls++;
-    if (map->grid[(ghost->y + 1) * COL + ghost->x] == WALL ||
-            map->grid[(ghost->y + 1) * COL + ghost->x] == WALL2)
+    if (map[(ghost->y + 1) * COL + ghost->x] == WALL ||
+            map[(ghost->y + 1) * COL + ghost->x] == WALL2)
         nb_walls++;
-    if (map->grid[ghost->y * COL + ghost->x - 1] == WALL ||
-            map->grid[ghost->y * COL + ghost->x - 1] == WALL2)
+    if (map[ghost->y * COL + ghost->x - 1] == WALL ||
+            map[ghost->y * COL + ghost->x - 1] == WALL2)
         nb_walls++;
-    if (map->grid[ghost->y * COL + ghost->x + 1] == WALL ||
-            map->grid[ghost->y * COL + ghost->x + 1] == WALL2)
+    if (map[ghost->y * COL + ghost->x + 1] == WALL ||
+            map[ghost->y * COL + ghost->x + 1] == WALL2)
         nb_walls++;
+    printf("ghost name: %s, nb_walls: %d, x:%d, y:%d, targetx:%d, targety:%d\n", ghost->name,nb_walls, ghost->x, ghost->y, ghost->targetX, ghost->targetY);
     // if there are 0/1 walls around the ghost then we can use pathing
     // This is basically saying that we are at an intersection
-    if (nb_walls < 1)
+    if (nb_walls <= 1)
         ghostPathing(ghost, blinky, map, player, nb_walls);
     else
         checkWall(ghost, map);
+    printf("ghost name: %s, direction: %d\n", ghost->name, ghost->direction);
     move(ghost);
 }
 
 // if direction is NULL then we only check the ghost direction
-void checkWall(Ghost* ghost, Map* map){
+void checkWall(Ghost* ghost, char* map){
     //check the next position of the ghost and if it's a wall then change the direction to the only direction it can go
     switch (ghost->direction)
     {
         case up:
-            if(map->grid[((ghost->y - 1) * COL) + ghost->x]== WALL)
+            if(map[((ghost->y - 1) * COL) + ghost->x]== WALL)
             {
-                if(map->grid[(ghost->y * COL) + ghost->x - 1] != WALL)
+                if(map[(ghost->y * COL) + ghost->x - 1] != WALL)
                 {
-                    ghost->direction = LEFT;
+                    ghost->direction = left;
                 }
-                else if(map->grid[(ghost->y * COL) + ghost->x + 1] != WALL)
+                else if(map[(ghost->y * COL) + ghost->x + 1] != WALL)
                 {
-                    ghost->direction = RIGHT;
+                    ghost->direction = right;
                 }
             }
             break;
         case down:
-            if(map->grid[(ghost->y + 1 * COL) + ghost->x] == WALL)
+            if(map[(ghost->y + 1 * COL) + ghost->x] == WALL)
             {
-                if(map->grid[(ghost->y * COL) + ghost->x - 1] != WALL)
+                if(map[(ghost->y * COL) + ghost->x - 1] != WALL)
                 {
-                    ghost->direction = LEFT;
+                    ghost->direction = left;
                 }
-                else if(map->grid[(ghost->y * COL) + ghost->x + 1] != WALL)
+                else if(map[(ghost->y * COL) + ghost->x + 1] != WALL)
                 {
-                    ghost->direction = RIGHT;
+                    ghost->direction = right;
                 }
             }
             break;
         case left:
-            if(map->grid[(ghost->y * COL) + ghost->x - 1] == WALL)
+            if(map[(ghost->y * COL) + ghost->x - 1] == WALL)
             {
-                if(map->grid[((ghost->y - 1) * COL) + ghost->x] != WALL)
+                if(map[((ghost->y - 1) * COL) + ghost->x] != WALL)
                 {
-                    ghost->direction = UP;
+                    ghost->direction = up;
                 }
-                else if(map->grid[((ghost->y + 1) * COL) + ghost->x] != WALL)
+                else if(map[((ghost->y + 1) * COL) + ghost->x] != WALL)
                 {
-                    ghost->direction = DOWN;
+                    ghost->direction = down;
                 }
             }
             break;
         case right:
-            if(map->grid[ghost->y * COL + ghost->x + 1] == WALL)
+            if(map[ghost->y * COL + ghost->x + 1] == WALL)
             {
-                if(map->grid[((ghost->y - 1) * COL) + ghost->x] != WALL)
+                if(map[((ghost->y - 1) * COL) + ghost->x] != WALL)
                 {
-                    ghost->direction = UP;
+                    ghost->direction = up;
                 }
-                else if(map->grid[((ghost->y + 1) * COL) + ghost->x] != WALL)
+                else if(map[((ghost->y + 1) * COL) + ghost->x] != WALL)
                 {
-                    ghost->direction = DOWN;
+                    ghost->direction = down;
                 }
             }
             break;
     }
 }
 
-void ghostPathing(Ghost* ghost, Ghost* blinky, Map* map, 
+void ghostPathing(Ghost* ghost, Ghost* blinky, char* map, 
         Player* player, int nb_walls)
 {
     // Depending on the ghost mode, and knowing that the ghost is at an
@@ -150,7 +153,7 @@ void ghostPathing(Ghost* ghost, Ghost* blinky, Map* map,
             {
                 // find the smallest heuristic value
                 case up:
-                    if(map->grid[(ghost->y - 1) * COL + ghost->x] != WALL &&
+                    if(map[(ghost->y - 1) * COL + ghost->x] != WALL &&
                             nb_walls == 1)
                     {
                         int distance = abs(ghost->x - ghost->targetX) + 
@@ -158,122 +161,122 @@ void ghostPathing(Ghost* ghost, Ghost* blinky, Map* map,
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = UP;
+                            ghost->direction = up;
                         }
                     }
-                    if(map->grid[ghost->y * COL + ghost->x - 1] != WALL)
+                    if(map[ghost->y * COL + ghost->x - 1] != WALL)
                     {
                         int distance = abs(ghost->x - 1 - ghost->targetX) +
                             abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = LEFT;
+                            ghost->direction = left;
                         }
                     }
-                    if(map->grid[ghost->y * COL + ghost->x + 1] != WALL)
+                    if(map[ghost->y * COL + ghost->x + 1] != WALL)
                     {
                         int distance = abs(ghost->x + 1 - ghost->targetX) +
                             abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = RIGHT;
+                            ghost->direction = right;
                         }
                     }
                     break;
                 case down:
-                    if(map->grid[(ghost->y + 1) * COL + ghost->x] != WALL)
+                    if(map[(ghost->y + 1) * COL + ghost->x] != WALL)
                     {
                         int distance = abs(ghost->x - ghost->targetX) +
                             abs(ghost->y + 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = DOWN;
+                            ghost->direction = down;
                         }
                     }
-                    if(map->grid[ghost->y * COL + ghost->x - 1] != WALL)
+                    if(map[ghost->y * COL + ghost->x - 1] != WALL)
                     {
                         int distance = abs(ghost->x - 1 - ghost->targetX) + abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = LEFT;
+                            ghost->direction = left;
                         }
                     }
-                    if(map->grid[ghost->y * COL + ghost->x + 1] != WALL)
+                    if(map[ghost->y * COL + ghost->x + 1] != WALL)
                     {
                         int distance = abs(ghost->x + 1 - ghost->targetX) +
                             abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = RIGHT;
+                            ghost->direction = right;
                         }
                     }
                     break;
                 case left:
-                    if(map->grid[(ghost->y - 1) * COL + ghost->x] != WALL)
+                    if(map[(ghost->y - 1) * COL + ghost->x] != WALL)
                     {
                         int distance = abs(ghost->x - ghost->targetX) +
                             abs(ghost->y - 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = UP;
+                            ghost->direction = up;
                         }
                     }
-                    if(map->grid[(ghost->y + 1) * COL + ghost->x] != WALL)
+                    if(map[(ghost->y + 1) * COL + ghost->x] != WALL)
                     {
                         int distance = abs(ghost->x - ghost->targetX) +
                             abs(ghost->y + 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = DOWN;
+                            ghost->direction = down;
                         }
                     }
-                    if(map->grid[ghost->y * COL + ghost->x - 1] != WALL)
+                    if(map[ghost->y * COL + ghost->x - 1] != WALL)
                     {
                         int distance = abs(ghost->x - 1 - ghost->targetX) +
                             abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = LEFT;
+                            ghost->direction = left;
                         }
                     }
                     break;
                 case right:
-                    if(map->grid[(ghost->y - 1) * COL + ghost->x] != WALL)
+                    if(map[(ghost->y - 1) * COL + ghost->x] != WALL)
                     {
                         int distance = abs(ghost->x - ghost->targetX) +
                             abs(ghost->y - 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = UP;
+                            ghost->direction = up;
                         }
                     }
-                    if(map->grid[(ghost->y + 1) * COL + ghost->x] != WALL)
+                    if(map[(ghost->y + 1) * COL + ghost->x] != WALL)
                     {
                         int distance = abs(ghost->x - ghost->targetX) +
                             abs(ghost->y + 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = DOWN;
+                            ghost->direction = down;
                         }
                     }
-                    if(map->grid[ghost->y * COL + ghost->x + 1] != WALL)
+                    if(map[ghost->y * COL + ghost->x + 1] != WALL)
                     {
                         int distance = abs(ghost->x + 1 - ghost->targetX) +
                             abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = RIGHT;
+                            ghost->direction = right;
                         }
                     }
                     break;
@@ -291,19 +294,19 @@ void ghostPathing(Ghost* ghost, Ghost* blinky, Map* map,
                 //depending on the direction of the player
                 //target 4 tiles ahead of the player
                 switch (player->direction){
-                    case UP:
+                    case up:
                         ghost->targetX = player->x;
                         ghost->targetY = player->y - 4;
                         break;
-                    case DOWN:
+                    case down:
                         ghost->targetX = player->x;
                         ghost->targetY = player->y + 4;
                         break;
-                    case LEFT:
+                    case left:
                         ghost->targetX = player->x - 4;
                         ghost->targetY = player->y;
                         break;
-                    case RIGHT:
+                    case right:
                         ghost->targetX = player->x + 4;
                         ghost->targetY = player->y;
                         break;
@@ -314,19 +317,19 @@ void ghostPathing(Ghost* ghost, Ghost* blinky, Map* map,
                 int dpx;
                 int dpy;
                 switch (player->direction){
-                    case UP:
+                    case up:
                         dpx = player->x;
                         dpy = player->y - 2;
                         break;
-                    case DOWN:
+                    case down:
                         dpx = player->x;
                         dpy = player->y + 2;
                         break;
-                    case LEFT:
+                    case left:
                         dpx = player->x - 2;
                         dpy = player->y;
                         break;
-                    case RIGHT:
+                    case right:
                         dpx = player->x + 2;
                         dpy = player->y;
                         break;
@@ -365,137 +368,134 @@ void ghostPathing(Ghost* ghost, Ghost* blinky, Map* map,
             switch (ghost->direction)
             {
                 case up:
-                    if(map->grid[(ghost->y - 1) * COL + ghost->x] != WALL)
+                    if(map[(ghost->y - 1) * COL + ghost->x] != WALL)
                     {
                         int distance = abs(ghost->x - ghost->targetX) +
                             abs(ghost->y - 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = UP;
+                            ghost->direction = up;
                         }
                     }
-                    if(map->grid[ghost->y * COL + ghost->x - 1] != WALL)
+                    if(map[ghost->y * COL + ghost->x - 1] != WALL)
                     {
                         int distance = abs(ghost->x - 1 - ghost->targetX) + 
                             abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = LEFT;
+                            ghost->direction = left;
                         }
                     }
-                    if(map->grid[ghost->y * COL + ghost->x + 1] != WALL)
+                    if(map[ghost->y * COL + ghost->x + 1] != WALL)
                     {
                         int distance = abs(ghost->x + 1 - ghost->targetX) +
                             abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = RIGHT;
+                            ghost->direction = right;
                         }
                     }
                     break;
                 case down:
-                    if(map->grid[(ghost->y + 1) * COL + ghost->x] != WALL)
+                    if(map[(ghost->y + 1) * COL + ghost->x] != WALL)
                     {
                         int distance = abs(ghost->x - ghost->targetX) +
                             abs(ghost->y + 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = DOWN;
+                            ghost->direction = down;
                         }
                     }
-                    if(map->grid[ghost->y * COL + ghost->x - 1] != WALL)
+                    if(map[ghost->y * COL + ghost->x - 1] != WALL)
                     {
                         int distance = abs(ghost->x - 1 - ghost->targetX) +
                             abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = LEFT;
+                            ghost->direction = left;
                         }
                     }
-                    if(map->grid[ghost->y * COL + ghost->x + 1] != WALL)
+                    if(map[ghost->y * COL + ghost->x + 1] != WALL)
                     {
                         int distance = abs(ghost->x + 1 - ghost->targetX) +
                             abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = RIGHT;
+                            ghost->direction = right;
                         }
                     }
                     break;
                 case left:
-                    if(map->grid[(ghost->y - 1) * COL + ghost->x] != WALL)
+                    if(map[(ghost->y - 1) * COL + ghost->x] != WALL)
                     {
                         int distance = abs(ghost->x - ghost->targetX) +
                             abs(ghost->y - 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = UP;
+                            ghost->direction = up;
                         }
                     }
-                    if(map->grid[(ghost->y + 1) * COL + ghost->x] != WALL)
+                    if(map[(ghost->y + 1) * COL + ghost->x] != WALL)
                     {
                         int distance = abs(ghost->x - ghost->targetX) +
                             abs(ghost->y + 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = DOWN;
+                            ghost->direction = down;
                         }
                     }
-                    if(map->grid[ghost->y * COL + ghost->x - 1] != WALL)
+                    if(map[ghost->y * COL + ghost->x - 1] != WALL)
                     {
                         int distance = abs(ghost->x - 1 - ghost->targetX) +
                             abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = LEFT;
+                            ghost->direction = left;
                         }
                     }
                     break;
                 case right:
-                    if(map->grid[(ghost->y - 1) * COL + ghost->x] != WALL)
+                    if(map[(ghost->y - 1) * COL + ghost->x] != WALL)
                     {
                         int distance = abs(ghost->x - ghost->targetX) +
                             abs(ghost->y - 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = UP;
+                            ghost->direction = up;
                         }
                     }
-                    if(map->grid[(ghost->y + 1) * COL + ghost->x] != WALL)
+                    if(map[(ghost->y + 1) * COL + ghost->x] != WALL)
                     {
                         int distance = abs(ghost->x - ghost->targetX) +
                             abs(ghost->y + 1 - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = DOWN;
+                            ghost->direction = down;
                         }
                     }
-                    if(map->grid[ghost->y * COL + ghost->x + 1] != WALL)
+                    if(map[ghost->y * COL + ghost->x + 1] != WALL)
                     {
                         int distance = abs(ghost->x + 1 - ghost->targetX) +
                             abs(ghost->y - ghost->targetY);
                         if(distance < min_distance)
                         {
                             min_distance = distance;
-                            ghost->direction = RIGHT;
+                            ghost->direction = right;
                         }
                     }
                     break;
             break;
             }
-
     }
-    
-    
 }

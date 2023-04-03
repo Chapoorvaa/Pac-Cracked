@@ -53,19 +53,19 @@ Ghost* ghostInit(char* label, int direction, int mode,
         int scatterTargetX, int scatterTargetY, int spawnX, int spawnY);
 
 // Moves the ghost and checks for collisions + intersections with the map
-void GhostMove(Ghost* ghost, Ghost* blinky, Map* map, struct Player* player);
+void GhostMove(Ghost* ghost, Ghost* blinky, char* map, struct Player* player);
 
 // Just moves the ghost (however no checks are made)
 void move(Ghost* ghost);
 
 // Checks if there is a wall in front of the ghost and changes direction
-void checkWall(Ghost* ghost, Map* map);
+void checkWall(Ghost* ghost, char* map);
 
 // When the ghost is at an intersection with 0 or 1 adjacent walls 
 // recalculate the target of the ghost
 // depending on the mode
 // There is a need to input blinky for inky's target calulation in CHASE mode
-void ghostPathing(Ghost* ghost, Ghost* blinky, Map* map, 
+void ghostPathing(Ghost* ghost, Ghost* blinky, char* map, 
         Player* player, int nb_walls);
 
 #endif

@@ -3,6 +3,7 @@
 
 #include "../obj/player.h"
 #include "../pacman_ai/lib/linked_list.h"
+#include "../obj/ghost.h"
 
 typedef struct Map{
     char* grid;

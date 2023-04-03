@@ -6,6 +6,7 @@
 #include "src/map.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <termios.h>
 #include <unistd.h>
 #include "pacman_ai/search.h"
 
@@ -39,6 +40,32 @@ llist* init_ghosts(int difficulty){
         llist_append(ghosts, pinky);
         return ghosts;
     }
+}
+
+// get input from keyboard
+int getch(){
+    struct termios oldtc, newtc;
+    int ch;
+    tcgetattr(STDIN_FILENO, &oldtc);
+    newtc = oldtc;
+    newtc.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newtc);
+    ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldtc);
+    return ch;
+}
+
+// case for arrow keys but not ready yet
+int get_input(){
+    int input = getch();
+    if (input == 27){
+        input = getch();
+        if (input == 91){
+            input = getch();
+            return input;
+        }
+    }
+    return input;
 }
 
 Game *init_game(int is_ai, int difficulty, int map_load){
@@ -86,6 +113,11 @@ void update(Game* game){
 	int x = game->pacman->x;
 	int y = game->pacman->y;
 	int pac_location = y * COL + x;
+    //check if the next position for pacman is valid
+    if (game->map->grid[pac_location + game->pacman->direction] != WALL ||
+        game->map->grid[pac_location + game->pacman->direction] != WALL2){
+        pac_location += game->pacman->direction;
+    }
 	pac_location += game->pacman->direction;
 	game->pacman->x = pac_location % COL;
 	game->pacman->y = pac_location / COL;
@@ -137,7 +169,8 @@ int all_eaten(Game *game){
 }
 
 int main(int argc, char** argv){
-    if (argc != 2){
+    if (argc != 3){
+        printf("Usage: ./pacman [difficulty] [is_ai]\n");
         exit(EXIT_FAILURE);
     }
     // - Launch the SDL Interface
@@ -147,7 +180,7 @@ int main(int argc, char** argv){
     // - Load gameplay loop:
     //   .Generate / Load map
     //   .Init player and ghosts
-	int is_ai = 1;
+	int is_ai = argv[2][0] - '0';
 	int difficulty = argv[1][0] - '0';
 	int map_load = 1;
     printf("Initiating game...\n");
@@ -170,6 +203,35 @@ int main(int argc, char** argv){
     //      _Update Score
         printf("Updating game state...\n");
 		if (game->is_ai != 1){
+            ch = get_input();
+            if (ch == 0){
+                ch = prev_ch;
+                printf("No input detected, using previous input\n");
+            }
+            else{
+                prev_ch = ch;
+                printf("Input detected, using new input\n");
+            }
+            switch (ch) {
+                case KEY_UP:
+                    game->pacman->direction = UP;
+                    break;
+                case KEY_DOWN:
+                    game->pacman->direction = DOWN;
+                    break;
+                case KEY_LEFT:
+                    game->pacman->direction = LEFT;
+                    break;
+                case KEY_RIGHT:
+                    game->pacman->direction = RIGHT;
+                    break;
+                default:
+                    break;
+            }
+            for (size_t i = 0; i < game->ghosts->length; i++){
+                GhostMove(llist_use(game->ghosts, i), llist_use(game->ghosts, 0),
+                        game->map->grid, game->pacman);
+            }
 			update(game);
 		}
 		else{
@@ -189,7 +251,7 @@ int main(int argc, char** argv){
             }
             for (size_t i = 0; i < game->ghosts->length; i++){
                 GhostMove(llist_use(game->ghosts, i), llist_use(game->ghosts, 0),
-                        game->map, game->pacman);
+                        game->map->grid, game->pacman);
             }
             update(game);
 		}

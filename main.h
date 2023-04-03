@@ -22,6 +22,11 @@
 #define EASY 2
 #define HARD 4
 
+#define KEY_UP 122
+#define KEY_DOWN 115
+#define KEY_LEFT 113
+#define KEY_RIGHT 100
+
 typedef struct Game{
 	int round;
     int difficulty;
