@@ -64,15 +64,16 @@ void GhostMove(Ghost* ghost, Ghost* blinky, char* map, struct Player* player){
     if (map[ghost->y * COL + ghost->x + 1] == WALL ||
             map[ghost->y * COL + ghost->x + 1] == WALL2)
         nb_walls++;
-    printf("ghost name: %s, nb_walls: %d, x:%d, y:%d, targetx:%d, targety:%d\n", ghost->name,nb_walls, ghost->x, ghost->y, ghost->targetX, ghost->targetY);
+    //printf("ghost name: %s, nb_walls: %d, x:%d, y:%d, targetx:%d, targety:%d\n", ghost->name,nb_walls, ghost->x, ghost->y, ghost->targetX, ghost->targetY);
     // if there are 0/1 walls around the ghost then we can use pathing
     // This is basically saying that we are at an intersection
     if (nb_walls <= 1)
         ghostPathing(ghost, blinky, map, player, nb_walls);
     else
         checkWall(ghost, map);
-    printf("ghost name: %s, direction: %d\n", ghost->name, ghost->direction);
     move(ghost);
+
+    //printf("ghost name: %s, direction: %d\n", ghost->name, ghost->direction);
 }
 
 // if direction is NULL then we only check the ghost direction
