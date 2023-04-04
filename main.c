@@ -114,7 +114,7 @@ void update(Game* game){
 	int y = game->pacman->y;
 	int pac_location = y * COL + x;
     //check if the next position for pacman is valid
-    if (game->map->grid[pac_location + game->pacman->direction] != WALL ||
+    if (game->map->grid[pac_location + game->pacman->direction] != WALL &&
         game->map->grid[pac_location + game->pacman->direction] != WALL2){
         pac_location += game->pacman->direction;
     }
@@ -213,18 +213,27 @@ int main(int argc, char** argv){
                 prev_ch = ch;
                 printf("Input detected, using new input\n");
             }
+            int pos = game->pacman->x + game->pacman->y * COL;
             switch (ch) {
                 case KEY_UP:
-                    game->pacman->direction = UP;
+                    if (game->map->grid[pos + UP] != WALL && game->map->grid[pos + UP] != WALL2){
+                        game->pacman->direction = UP;
+                    }
                     break;
                 case KEY_DOWN:
-                    game->pacman->direction = DOWN;
+                    if (game->map->grid[pos + DOWN] != WALL && game->map->grid[pos + DOWN] != WALL2){
+                        game->pacman->direction = DOWN;
+                    }
                     break;
                 case KEY_LEFT:
-                    game->pacman->direction = LEFT;
+                    if (game->map->grid[pos + LEFT] != WALL && game->map->grid[pos + LEFT] != WALL2){
+                        game->pacman->direction = LEFT;
+                    }
                     break;
                 case KEY_RIGHT:
-                    game->pacman->direction = RIGHT;
+                    if (game->map->grid[pos + RIGHT] != WALL && game->map->grid[pos + RIGHT] != WALL2){
+                        game->pacman->direction = RIGHT;
+                    }
                     break;
                 default:
                     break;

@@ -8,8 +8,8 @@
 #define SPAWN_X 13
 #define SPAWN_Y 21
 
-#define UP -28
-#define DOWN 28
+#define UP -COL
+#define DOWN COL
 #define LEFT -1
 #define RIGHT 1
 #define IDLE 0
