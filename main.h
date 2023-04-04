@@ -44,6 +44,6 @@ void free_game(Game* game);
 
 int game_over(Game* game);
 
-void update(Game* game);
+int update(Game* game);
 
 #endif

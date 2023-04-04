@@ -95,7 +95,7 @@ void checkWall(Ghost* ghost, char* map){
             }
             break;
         case down:
-            if(map[(ghost->y + 1 * COL) + ghost->x] == WALL)
+            if(map[((ghost->y + 1) * COL) + ghost->x] == WALL)
             {
                 if(map[(ghost->y * COL) + ghost->x - 1] != WALL)
                 {

@@ -4,6 +4,7 @@
 #include "pacman_ai/lib/linked_list.h"
 #include "pacman_ai/minimax.h"
 #include "src/map.h"
+#include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <termios.h>
@@ -108,7 +109,7 @@ int game_over(Game* game){
     }
 }
 
-void update(Game* game){
+int update(Game* game){
     // check each entities direction and update x and y values accordingly
 	int x = game->pacman->x;
 	int y = game->pacman->y;
@@ -132,6 +133,7 @@ void update(Game* game){
 				if (game_over(game)){
 					game->map->points += GAME_OVER;
 				}
+                return DEAD;
 			}
 			else{
 				if (ghost->mode == FRIGHTENED){
@@ -148,10 +150,12 @@ void update(Game* game){
 		}
 		else{
 			game->map->points += POWER_PELLET;
+            return POWER_PELLET;
 		}
 		game->map->grid[pac_location] = ' ';
 	}
 	game->round++;
+    return 0;
 }
 
 int all_eaten(Game *game){
@@ -184,6 +188,7 @@ int main(int argc, char** argv){
 	int map_load = 1;
     int ch = 0;
     int prev_ch = 0;
+    int countdown = 10;
     printf("Initiating game...\n");
 	Game* game = init_game(is_ai, difficulty, map_load);
 	gtree* minimax_tree = NULL;
@@ -191,6 +196,7 @@ int main(int argc, char** argv){
 	if (game->is_ai == 1 && difficulty > 2){
 		minimax_tree = create_tree(game, 6);
 	}
+    int state = 0;
     printf("Starting game...\n");
 	while (game_over(game) == 0 && all_eaten(game) == 1){
     //   .Start Gameplay loop (while not_won):
@@ -242,7 +248,7 @@ int main(int argc, char** argv){
                 GhostMove(llist_use(game->ghosts, i), llist_use(game->ghosts, 0),
                         game->map->grid, game->pacman);
             }
-			update(game);
+			state = update(game);
 		}
 		else{
             switch (game->difficulty) {
@@ -263,8 +269,38 @@ int main(int argc, char** argv){
                 GhostMove(llist_use(game->ghosts, i), llist_use(game->ghosts, 0),
                         game->map->grid, game->pacman);
             }
-            update(game);
+            state = update(game);
 		}
+        /*
+        if (countdown == 0){
+            for (int i = 0; i < game->difficulty; i++){
+                Ghost *g = llist_use(game->ghosts, i);
+                g->mode = CHASE;
+            }
+        }
+        else{
+            countdown--;
+        }
+
+        GhostMode tmp = CHASE;
+        if (state != 0){
+            if (state == POWER_PELLET){
+                tmp = FRIGHTENED;
+                countdown += 10;
+            }
+            if (state == DEAD){
+                tmp = SCATTER;
+            }
+            for (int i = 0; i < game->difficulty; i++){
+                Ghost *g = llist_use(game->ghosts, i);
+                g->mode = tmp;
+                countdown += 10;
+            }
+            state = 0;
+        }
+        */
+        state = countdown;
+        countdown = state;
 		// Makes loop sleep for 1s
 		sleep(1);
 	}
