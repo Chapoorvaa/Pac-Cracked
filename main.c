@@ -131,7 +131,7 @@ void updateGhostMode(Game* game){
             game->globalGhostFrightened = 0;
         }
         if (game->globalGhostKill == gr){
-            ghost->mode = globalGhostMode;
+            ghost->mode = game->globalGhostMode;
             game->globalGhostKill = 0;
         }
         if (ghost->mode == DEAD && ghost->x == 13 && ghost->y == 13){
