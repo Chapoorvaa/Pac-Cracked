@@ -10,6 +10,63 @@
 #define WALL '#'
 #define WALL2 '_'
 
+char* nbAdjacentWalls(char* grid, int x, int y, int* nbWalls, int* house)
+{
+    //Check the 8 adjacent tiles and increment nbWalls for each wall found
+    // -> check if the tile is a wall
+    // -> increment nbWalls if it is
+    // -> return the string of the 8 adjacent tiles
+    char* adjacentTiles = calloc(9, sizeof(char));
+    *nbWalls = 0;
+    adjacentTiles[4] = -1;
+    int i;
+    int j;
+    if (x == 0)
+        i = 0;
+    else 
+        i = -1;
+
+    if (y == 0)
+        j = 0;
+    else 
+        j = -1;
+    
+    int imax;
+    int jmax;
+    if (x == COL - 1)
+        imax = 1;
+    else 
+        imax = 2;
+    
+    if (y == ROW - 1)
+        jmax = 1;
+    else 
+        jmax = 2;
+    
+    for (; i < imax; i++){
+        for (; j < jmax; j++){
+            if (((j+1) * 3 + (i+1)) != 4){
+                if (grid[(y + j) * COL + (x + i)] == WALL2){
+                    (*nbWalls)++;
+                    *house = 1;
+                    adjacentTiles[(j + 1) * 3 + (i + 1)] = 2;
+                } else if (grid[(y + j) * COL + (x + i)] == WALL){
+                    (*nbWalls)++;
+                    adjacentTiles[(j + 1) * 3 + (i + 1)] = 1;
+                } else {
+                    adjacentTiles[(j + 1) * 3 + (i + 1)] = 0;
+                }
+            }
+        }
+    }
+    return adjacentTiles;
+}
+
+int chooseTile(char* tiles, int nbWalls, int house){
+    //TODO: Choose the correct png to use depending on the adjacent tiles
+    return -1;
+}
+
 void combinePNGs(const char* outputFilename, Map* map,
         int width, int height)
 {
@@ -57,9 +114,16 @@ void combinePNGs(const char* outputFilename, Map* map,
     //            use
     //      . Use SDL_BlitSurface to copy the right PNG to the right spot
     // Once out of the loop save the combined image to the output file name
+    int* nbWalls = malloc(sizeof(int));
+    char* adjacentTiles;
     for (int y = 0; y < ROW; y++){
         for (int x = 0; x < COL; x++){
-        
+            if (grid[y * COL + x] == WALL || grid[y * COL + x] == WALL2){
+                int house = 0;
+                adjacentTiles = nbAdjacentWalls(grid, x, y, nbWalls, &house);
+                //TODO : choose the correct tile
+                free(adjacentTiles);
+            }
         }
     }
 
