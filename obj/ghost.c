@@ -41,6 +41,18 @@ void move(Ghost* ghost){
 }
 
 void GhostMove(Ghost* ghost, Ghost* blinky, char* map, struct Player* player){
+    if (ghost->mode == DEAD){
+        if (ghost->x == 13 && ghost->y == 11)
+            ghost->y += 1;
+        else if (ghost->x == 13 && ghost->y == 12)
+            ghost->y += 1;
+        else {
+            ghostPathing(ghost, blinky, map, player, 0);
+            move(ghost);
+        }
+
+        return;
+    }
     // case where the ghost is still in the ghost house
     if (map[(ghost->y - 1) * COL + ghost->x] == WALL2){
         ghost->y -= 1;

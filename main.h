@@ -31,6 +31,9 @@ typedef struct Game{
 	int round;
     int difficulty;
     int is_ai;
+    GhostMode globalGhostMode; // reference for all ghosts after dead or frightened
+    int globalGhostFrightened; // 0 = not frightened, otherwise frightened until round x
+    int globalGhostKill; // 0 = not killable, otherwise scatter until round x
     Player* pacman;
     Map* map;
     llist* ghosts;
