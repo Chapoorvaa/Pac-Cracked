@@ -6,13 +6,13 @@ CFLAGS = -Wall -Wextra -O3 `pkg-config --cflags sdl2 SDL2_image SDL2_ttf`
 LDFLAGS =
 LDLIBS = `pkg-config --libs sdl2 SDL2_image SDL2_ttf`
 
-all: main
+all: main 
 
-SRC = men.c
+SRC = main.c play.c
 OBJ = ${SRC:.c=.o}
 EXE = ${SRC:.c=}
 
-main: main.o
+main: main.o play.o
 
 
 .PHONY: clean
