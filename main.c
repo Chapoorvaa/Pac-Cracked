@@ -116,26 +116,40 @@ void updateGhostMode(Game* game){
     // update ghost mode
     // update global game mode
     int gr = game->round;
-    if (gr == 0 || gr == 27 || gr == 54 || gr == 79)
+    int change = 0;
+    if (gr == 0 || gr == 27 || gr == 54 || gr == 79){
         game->globalGhostMode = SCATTER;
-    else if (gr == 7 || gr == 34 || gr == 59 || gr == 84)
+        change = 1;
+    }
+    else if (gr == 7 || gr == 34 || gr == 59 || gr == 84){
         game->globalGhostMode = CHASE;
+        change = 1;
+    }
     
     // update ghost mode for each ghost
     for (size_t i = 0; i < game->ghosts->length; i++){
         Ghost* ghost = llist_use(game->ghosts, i);
+        // if the timer for the frightened mode is over
         if (game->globalGhostKill == 0 && 
                 ghost->mode == FRIGHTENED &&
                 gr == game->globalGhostFrightened){
             ghost->mode = game->globalGhostMode;
             game->globalGhostFrightened = 0;
         }
+        // if the timer after the ghost killed pac man is over
         if (game->globalGhostKill == gr){
             ghost->mode = game->globalGhostMode;
             game->globalGhostKill = 0;
+            
         }
         if (ghost->mode == DEAD && ghost->x == 13 && ghost->y == 13){
             ghost->mode = game->globalGhostMode;
+            
+        }
+
+        if (change == 1){
+            ghost->mode = game->globalGhostMode;
+            
         }
     }
 }

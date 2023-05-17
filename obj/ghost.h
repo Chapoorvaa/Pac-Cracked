@@ -52,6 +52,9 @@ typedef struct Ghost
 Ghost* ghostInit(char* label, int direction, int mode, 
         int scatterTargetX, int scatterTargetY, int spawnX, int spawnY);
 
+// check the number of adjacent walls
+int checkWalls(char* map, int x, int y);
+
 // Moves the ghost and checks for collisions + intersections with the map
 void GhostMove(Ghost* ghost, Ghost* blinky, char* map, struct Player* player);
 
