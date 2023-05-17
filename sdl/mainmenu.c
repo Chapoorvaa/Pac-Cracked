@@ -7,6 +7,8 @@
 int window_width, window_height;
 int image_width, image_height;
 
+void draw_menu(SDL_Renderer* renderer);
+
 void draw_play_mode(SDL_Renderer* renderer)
 {
     SDL_RenderClear(renderer);
@@ -257,7 +259,6 @@ int main() {
             break;
         }
     }
-
     // Clean up
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
