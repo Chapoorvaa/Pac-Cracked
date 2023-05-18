@@ -8,6 +8,65 @@ int window_width, window_height;
 int image_width, image_height;
 
 void draw_menu(SDL_Renderer* renderer);
+void draw_play_mode(SDL_Renderer* renderer);
+
+void draw_play_ai(SDL_Renderer* renderer)
+{
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer,11,63,114,255);
+    SDL_Surface* play_surface = IMG_Load("menuimg/who.png");
+    SDL_Texture* play_texture = SDL_CreateTextureFromSurface(renderer, play_surface);
+    SDL_FreeSurface(play_surface);
+
+    SDL_QueryTexture(play_texture, NULL, NULL, &image_width, &image_height);
+    SDL_Rect play_rect = { 0, 0, image_width, image_height};
+    
+    SDL_RenderCopy(renderer, play_texture, NULL, &play_rect);
+
+    int buttonwidth = 300;
+    int buttonheight = 300;
+
+    int back_x = 450;
+    int back_y = 713;
+    int ai_y = (window_height - buttonheight) / 2;
+    int me_x = 700;
+    int ai_x = 200;
+
+    SDL_RenderPresent(renderer);
+
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)) {
+        
+        if (event.type == SDL_QUIT) {
+            break;
+        } 
+        else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            int x = event.button.x;
+            int y = event.button.y;
+            if (x >= back_x && x <= back_x + 300 &&
+                y >= back_y && y <= back_y + 60) {
+                draw_play_mode(renderer);
+            }
+            else if (x >= ai_x && x <= ai_x + buttonwidth &&
+                y >= ai_y && y <= ai_y + buttonheight) {
+                // TODO
+                SDL_RenderClear(renderer);
+                SDL_SetRenderDrawColor(renderer,11,63,114,255);
+                SDL_RenderPresent(renderer);
+            }
+            else if (x >= me_x && x <= me_x + buttonwidth &&
+             y >= ai_y && y <= ai_y + buttonheight) {
+                //TODO
+                SDL_RenderClear(renderer);
+                SDL_SetRenderDrawColor(renderer,11,63,114,255);
+                SDL_RenderPresent(renderer);
+            }
+            
+        
+        }
+    }
+
+}
 
 void draw_play_mode(SDL_Renderer* renderer)
 {
@@ -52,23 +111,17 @@ void draw_play_mode(SDL_Renderer* renderer)
             else if (x >= easy_x && x <= easy_x + buttonwidth &&
                 y >= easy_y && y <= easy_y + buttonheight) {
                 // TODO
-                SDL_RenderClear(renderer);
-                SDL_SetRenderDrawColor(renderer,11,63,114,255);
-                SDL_RenderPresent(renderer);
+                draw_play_ai(renderer);
             }
             else if (x >= easy_x && x <= easy_x + buttonwidth &&
              y >= medium_y && y <= medium_y + buttonheight) {
                 //TODO
-                SDL_RenderClear(renderer);
-                SDL_SetRenderDrawColor(renderer,11,63,114,255);
-                SDL_RenderPresent(renderer);
+                draw_play_ai(renderer);
             }
             else if (x >= easy_x && x <= easy_x + buttonwidth &&
              y >= hard_y && y <= hard_y + buttonheight) {
                 // TODO
-                SDL_RenderClear(renderer);
-                SDL_SetRenderDrawColor(renderer,11,63,114,255);
-                SDL_RenderPresent(renderer);
+                draw_play_ai(renderer);
             }
         }
     }
