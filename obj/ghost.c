@@ -157,8 +157,11 @@ int manhattanDistance(int x1, int y1, int x2, int y2){
     return abs(x1 - x2) + abs(y1 - y2);
 }
 
+// when at an intersection the ghost will choose the direction 
+// that will bring it closer to the target
 GhostDirection updateDirection(int ghostx, int ghosty,
-        int targetx, int targety, char* map, GhostDirection direction, GhostMode mode, int nb_walls){
+        int targetx, int targety, char* map, GhostDirection direction,
+        GhostMode mode, int nb_walls){
     int min_distance = 1000; // arbitrary large number
     GhostDirection new_direction = direction;
     switch(direction)

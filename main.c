@@ -73,7 +73,7 @@ Game *init_game(int is_ai, int difficulty, int map_load){
     Game *game;
     game = malloc(sizeof(Game));
     game->difficulty = difficulty;
-    game->globalGhostMode = 0; // 0 for scatter, 1 for chase
+    game->globalGhostMode = SCATTER;
     game->globalGhostFrightened = 0;
     game->globalGhostKill = 0;
     if (map_load != 0){
@@ -126,31 +126,33 @@ void updateGhostMode(Game* game){
         change = 1;
     }
     
-    // update ghost mode for each ghost
+    // update ghost mode for each ghost if there is a change
     for (size_t i = 0; i < game->ghosts->length; i++){
         Ghost* ghost = llist_use(game->ghosts, i);
         // if the timer for the frightened mode is over
-        if (game->globalGhostKill == 0 && 
-                ghost->mode == FRIGHTENED &&
-                gr == game->globalGhostFrightened){
-            ghost->mode = game->globalGhostMode;
-            game->globalGhostFrightened = 0;
+        switch(ghost->mode){
+            case DEAD:
+                if (ghost->x == ghost->spawnX && ghost->y == ghost->spawnY){
+                    ghost->mode = game->globalGhostMode;
+                }
+                break;
+            case FRIGHTENED:
+                if (game->globalGhostFrightened == game->round){
+                    ghost->mode = game->globalGhostMode;
+                }
+                break;
+            case SCATTER:
+                if (change || game->globalGhostKill == game->round){
+                    ghost->mode = game->globalGhostMode;
+                }
+                break;
+            case CHASE:
+                if (change){
+                    ghost->mode = game->globalGhostMode;
+                }
+                break;
         }
-        // if the timer after the ghost killed pac man is over
-        if (game->globalGhostKill == gr){
-            ghost->mode = game->globalGhostMode;
-            game->globalGhostKill = 0;
-            
-        }
-        if (ghost->mode == DEAD && ghost->x == 13 && ghost->y == 13){
-            ghost->mode = game->globalGhostMode;
-            
-        }
-
-        if (change == 1){
-            ghost->mode = game->globalGhostMode;
-            
-        }
+        printf("GhostName: %s -> mode : %i\n",ghost->name, ghost->mode);
     }
 }
 
