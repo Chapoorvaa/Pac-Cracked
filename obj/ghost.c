@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits.h>
 
 Ghost* ghostInit(char* label, int direction, int mode,
  int scatterTargetX, int scatterTargetY, int spawnX, int spawnY)
@@ -80,7 +81,7 @@ void GhostMove(Ghost* ghost, Ghost* blinky, char* map, struct Player* player){
         ghost->y -= 1;
         return;
     }
-    
+    printf("nb_walls: %d\n", nb_walls);
     //printf("ghost name: %s, nb_walls: %d, x:%d, y:%d, targetx:%d, targety:%d\n", ghost->name,nb_walls, ghost->x, ghost->y, ghost->targetX, ghost->targetY);
     // if there are 0/1 walls around the ghost then we can use pathing
     // This is basically saying that we are at an intersection
@@ -162,14 +163,14 @@ int manhattanDistance(int x1, int y1, int x2, int y2){
 GhostDirection updateDirection(int ghostx, int ghosty,
         int targetx, int targety, char* map, GhostDirection direction,
         GhostMode mode, int nb_walls){
-    int min_distance = 1000; // arbitrary large number
+    int min_distance = INT_MAX; // arbitrary large number
     GhostDirection new_direction = direction;
     switch(direction)
     {
         case up:
             if(map[((ghosty - 1) * COL) + ghostx] != WALL)
             {
-                if (mode == DEAD || nb_walls >= 1){ 
+                if (mode == DEAD || nb_walls >= 1){
                     if (manhattanDistance(ghostx, ghosty - 1, targetx, targety) < min_distance){
                         min_distance = manhattanDistance(ghostx, ghosty - 1, targetx, targety);
                         new_direction = up;

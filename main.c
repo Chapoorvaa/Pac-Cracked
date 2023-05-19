@@ -152,7 +152,10 @@ void updateGhostMode(Game* game){
                 }
                 break;
         }
-        printf("GhostName: %s -> mode : %i\n",ghost->name, ghost->mode);
+        //printf("GhostName: %s -> mode : %i, 
+        //targetTiles : %i,%i, direction : %i\n",ghost->name,
+        //ghost->mode, ghost->targetX, ghost->targetY, ghost->direction);
+
     }
 }
 
