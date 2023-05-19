@@ -129,24 +129,28 @@ void updateGhostMode(Game* game){
     // update ghost mode for each ghost if there is a change
     for (size_t i = 0; i < game->ghosts->length; i++){
         Ghost* ghost = llist_use(game->ghosts, i);
-        // if the timer for the frightened mode is over
         switch(ghost->mode){
             case DEAD:
+                // if the ghost is back at his spawn point, change his mode
                 if (ghost->x == ghost->spawnX && ghost->y == ghost->spawnY){
                     ghost->mode = game->globalGhostMode;
                 }
                 break;
             case FRIGHTENED:
+                // once the frightened time is over, change the ghost mode
                 if (game->globalGhostFrightened == game->round){
                     ghost->mode = game->globalGhostMode;
                 }
                 break;
             case SCATTER:
+                // if the global mode changes, change the ghost mode
+                // or if the timer after a ghost has killed pacman is over
                 if (change || game->globalGhostKill == game->round){
                     ghost->mode = game->globalGhostMode;
                 }
                 break;
             case CHASE:
+                // if the global mode changes, change the ghost mode
                 if (change){
                     ghost->mode = game->globalGhostMode;
                 }
@@ -183,7 +187,6 @@ int update(Game* game){
 		if (ghost_location == pac_location){
 			if (ghost->mode == SCATTER || ghost->mode == CHASE){
 				player_respawn(game->pacman);
-				game->pacman->lives--;
 				game->map->points += DEATH;
                 // set the ghosts to scatter for 5 rounds after respawn
                 game->globalGhostKill = game->round + 5;
@@ -216,10 +219,13 @@ int update(Game* game){
                 Ghost* ghost = llist_use(game->ghosts, i);
                 if (ghost->mode != DEAD){
                     ghost->mode = FRIGHTENED;
+                    // set the amount of rounds the ghosts will be frightened
                     game->globalGhostFrightened = game->round + 20;
                 }
             }
             game->map->grid[pac_location] = ' ';
+            updateGhostMode(game);
+            game->round++;
             return POWER_PELLET;
 		}
 		game->map->grid[pac_location] = ' ';
@@ -367,10 +373,14 @@ int main(int argc, char** argv){
         */
         state = countdown;
         countdown = state;
+        if (game->pacman->lives == 0){
+            break;
+        }
 		// Makes loop sleep for 1s
 		sleep(1);
 	}
     printf("Game over...\n");
+    printf("Score: %d\n", game->map->points);
     if (minimax_tree != NULL){
 	    free_minimax(minimax_tree);
     }

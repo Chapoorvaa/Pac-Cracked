@@ -81,7 +81,7 @@ void GhostMove(Ghost* ghost, Ghost* blinky, char* map, struct Player* player){
         ghost->y -= 1;
         return;
     }
-    printf("nb_walls: %d\n", nb_walls);
+    //printf("nb_walls: %d\n", nb_walls);
     //printf("ghost name: %s, nb_walls: %d, x:%d, y:%d, targetx:%d, targety:%d\n", ghost->name,nb_walls, ghost->x, ghost->y, ghost->targetX, ghost->targetY);
     // if there are 0/1 walls around the ghost then we can use pathing
     // This is basically saying that we are at an intersection
