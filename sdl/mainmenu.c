@@ -2,14 +2,46 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <unistd.h>
+
+#define MAX_MAPS 10
+#define MAPS_FOLDER "maps"
+#define MAX_FILES 256
+
+char selectedMapPath[512] = "maps/map_1.txt";
+
 
 int window_width, window_height;
 int image_width, image_height;
 
+void draw_mappng(SDL_Renderer* renderer)
+{
+    SDL_RenderClear(renderer);
+    
+    SDL_Surface* map_surface = IMG_Load("Default_Map.png");  // function arthur 
+    SDL_Texture* map_texture = SDL_CreateTextureFromSurface(renderer, map_surface);
+    SDL_FreeSurface(map_surface);
+
+    int map_x = 0;
+    int map_y = 0;
+    int map_height = 928 ;
+    int map_width = 864 ;
+
+    SDL_Rect map_rect = { map_x, map_y, map_height,map_width};
+    SDL_RenderCopy(renderer, map_texture, NULL, &map_rect);
+    SDL_RenderPresent(renderer);
+
+    SDL_DestroyTexture(map_texture);
+
+}
+
+
 void draw_menu(SDL_Renderer* renderer);
 void draw_play_mode(SDL_Renderer* renderer);
 void draw_play_ai(SDL_Renderer* renderer);
+void draw_select_map(SDL_Renderer* renderer);
+
 
 void draw_map(SDL_Renderer* renderer)
 {
@@ -51,17 +83,12 @@ void draw_map(SDL_Renderer* renderer)
             }
             else if (x >= ai_x && x <= ai_x + buttonwidth &&
                 y >= ai_y && y <= ai_y + buttonheight) {
-                // TODO : map load
-                SDL_RenderClear(renderer);
-                SDL_SetRenderDrawColor(renderer,11,63,114,255);
-                SDL_RenderPresent(renderer);
+                draw_select_map(renderer);
             }
             else if (x >= me_x && x <= me_x + buttonwidth &&
              y >= ai_y && y <= ai_y + buttonheight) {
-                //TODO : map generate
-                SDL_RenderClear(renderer);
-                SDL_SetRenderDrawColor(renderer,11,63,114,255);
-                SDL_RenderPresent(renderer);
+                SDL_SetRenderDrawColor(renderer,0,0,0,255);
+                draw_mappng(renderer);
             }
             
         
@@ -165,17 +192,17 @@ void draw_play_mode(SDL_Renderer* renderer)
             }
             else if (x >= easy_x && x <= easy_x + buttonwidth &&
                 y >= easy_y && y <= easy_y + buttonheight) {
-                // TODO
+                // TODO : PEACEFULL
                 draw_play_ai(renderer);
             }
             else if (x >= easy_x && x <= easy_x + buttonwidth &&
              y >= medium_y && y <= medium_y + buttonheight) {
-                //TODO
+                //TODO : easy
                 draw_play_ai(renderer);
             }
             else if (x >= easy_x && x <= easy_x + buttonwidth &&
              y >= hard_y && y <= hard_y + buttonheight) {
-                // TODO
+                // TODO: hard
                 draw_play_ai(renderer);
             }
         }
@@ -187,9 +214,49 @@ void draw_play_mode(SDL_Renderer* renderer)
 void draw_select_map(SDL_Renderer* renderer)
 {
     SDL_RenderClear(renderer);
-    SDL_SetRenderDrawColor(renderer,11,63,114,255);
+    SDL_SetRenderDrawColor(renderer, 11, 63, 114, 255);
     SDL_RenderPresent(renderer);
+
+    SDL_Surface* sm_surface = IMG_Load("menuimg/button.png");
+    SDL_Texture* sm_texture = SDL_CreateTextureFromSurface(renderer, sm_surface);
+    SDL_FreeSurface(sm_surface);
+
+    SDL_QueryTexture(sm_texture, NULL, NULL, &image_width, &image_height);
+    SDL_QueryTexture(sm_texture, NULL, NULL, &image_width, &image_height);
+    SDL_Rect sm_rect = { 0, 0, image_width, image_height};
+    
+    SDL_RenderCopy(renderer, sm_texture, NULL, &sm_rect);
+    int back_x = 450;
+    int back_y = 713; 
+
+    // todo : draw the files buttons
+
+
+    SDL_RenderPresent(renderer);
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)) {
+    
+        if (event.type == SDL_QUIT) {
+            break;
+        } 
+        else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            int x = event.button.x;
+            int y = event.button.y;
+            if (x >= back_x && x <= back_x + 300 &&
+                y >= back_y && y <= back_y + 60) {
+                draw_menu(renderer); // for testing purposes
+            }
+            else if (x >= 0 && x <= 1200 &&
+             y >= 0 && y <= 864)
+            {
+                SDL_SetRenderDrawColor(renderer,0,0,0,255);
+                draw_mappng(renderer);
+            }
+        }
+    }
+   
 }
+
 
 void draw_help(SDL_Renderer* renderer)
 {
@@ -337,6 +404,7 @@ int main() {
 
     // Initialize SDL_Image
     IMG_Init(IMG_INIT_PNG);
+    TTF_Init();
 
     // Create a window
     SDL_Window* window = SDL_CreateWindow(
@@ -371,6 +439,7 @@ int main() {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     IMG_Quit();
+    TTF_Quit();
     SDL_Quit();
 
     return 0;

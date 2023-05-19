@@ -2,13 +2,13 @@
 
 CC = gcc
 CPPFLAGS =
-CFLAGS = -Wall -Wextra -O3 `pkg-config --cflags sdl2 SDL2_image SDL2_ttf`
-LDFLAGS =
+CFLAGS =  -std=c99  -Wall -Wextra -O3 `pkg-config --cflags sdl2 SDL2_image SDL2_ttf`
+LDFLAGS = 
 LDLIBS = `pkg-config --libs sdl2 SDL2_image SDL2_ttf`
 
 all: mainmenu
 
-SRC = mainmenu.c
+SRC = mainmenu.c 
 OBJ = ${SRC:.c=.o}
 EXE = ${SRC:.c=}
 
