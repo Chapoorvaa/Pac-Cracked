@@ -4,6 +4,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <unistd.h>
+#include "play.h"
 
 #define MAX_MAPS 10
 #define MAPS_FOLDER "maps"
@@ -11,7 +12,8 @@
 
 char selectedMapPath[512] = "maps/map_1.txt";
 
-
+int difficulty;
+int is_ai;
 int window_width, window_height;
 int image_width, image_height;
 
@@ -33,6 +35,14 @@ void draw_mappng(SDL_Renderer* renderer)
     SDL_RenderPresent(renderer);
 
     SDL_DestroyTexture(map_texture);
+
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)) {
+        
+        if (event.type == SDL_QUIT) {
+            break;
+        } 
+    }
 
 }
 
@@ -136,11 +146,13 @@ void draw_play_ai(SDL_Renderer* renderer)
             else if (x >= ai_x && x <= ai_x + buttonwidth &&
                 y >= ai_y && y <= ai_y + buttonheight) {
                 // TODO : update in the game it's ai 
+                is_ai = 1;
                 draw_map(renderer);
             }
             else if (x >= me_x && x <= me_x + buttonwidth &&
              y >= ai_y && y <= ai_y + buttonheight) {
                 //TODO : update in the game it's human playing
+                is_ai = 0;
                 draw_map(renderer);
             }
             
@@ -251,6 +263,45 @@ void draw_select_map(SDL_Renderer* renderer)
             {
                 SDL_SetRenderDrawColor(renderer,0,0,0,255);
                 draw_mappng(renderer);
+            }
+        }
+    }
+   
+}
+
+void draw_high_score(SDL_Renderer* renderer)
+{
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer, 11, 63, 114, 255);
+    SDL_RenderPresent(renderer);
+
+    SDL_Surface* sm_surface = IMG_Load("menuimg/high_score.png");
+    SDL_Texture* sm_texture = SDL_CreateTextureFromSurface(renderer, sm_surface);
+    SDL_FreeSurface(sm_surface);
+
+    SDL_QueryTexture(sm_texture, NULL, NULL, &image_width, &image_height);
+    SDL_QueryTexture(sm_texture, NULL, NULL, &image_width, &image_height);
+    SDL_Rect sm_rect = { 0, 0, image_width, image_height};
+    
+    SDL_RenderCopy(renderer, sm_texture, NULL, &sm_rect);
+    int back_x = 450;
+    int back_y = 713; 
+
+    // TODO : display the high score
+
+    SDL_RenderPresent(renderer);
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)) {
+    
+        if (event.type == SDL_QUIT) {
+            break;
+        } 
+        else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            int x = event.button.x;
+            int y = event.button.y;
+            if (x >= back_x && x <= back_x + 300 &&
+                y >= back_y && y <= back_y + 60) {
+                draw_menu(renderer); 
             }
         }
     }
@@ -375,6 +426,7 @@ void draw_menu(SDL_Renderer* renderer)
             else if (x >= play_x && x <= play_x + buttonwidth &&
              y >= high_score_y && y <= high_score_y + buttonheight) {
                 // Handle High Score button click
+                draw_high_score(renderer);
             }
             else if (x >= play_x && x <= play_x + buttonwidth &&
              y >= help_y && y <= help_y + buttonheight) {

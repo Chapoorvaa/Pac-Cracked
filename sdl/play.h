@@ -1,6 +1,6 @@
 #ifndef PLAY_H
 #define PLAY_H
 
-void draw_mappng(SDL_Renderer* renderer);
+void draw_game(SDL_Renderer* renderer);
 
 #endif
