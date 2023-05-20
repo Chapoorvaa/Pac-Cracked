@@ -115,47 +115,6 @@ int Bellman(Game *game, size_t src){
     return d;
 }
 
-
-int bfs(Game *game){
-    llist *q = init_llist();
-    char *grid = game->map->grid;
-    int src = game->pacman->y * ROW + game->pacman->x;
-    llist_prepend(q, &src);
-    int M[ROW * COL];
-    for (int i = 0; i < ROW * COL; i++){
-        M[i] = -2;
-    }
-    M[src] = -1;
-    int not_found = -1;
-    while ((q->length != 0) && (not_found == -1)){
-        int *n = llist_fastpop(q);
-        int *adjlist = form_adjlist(*n, game->map);
-        for(size_t i = 0; i < 4; i++){
-            int adj = adjlist[i];
-            if (adj == 0){
-                continue;
-            }
-            char k = grid[adj];
-            if (k != ' '){
-                not_found = adj;
-            }
-            if (M[adj] == -2){
-                M[adj] = *n;
-                llist_prepend(q, &adj);
-            }
-        }
-        free(adjlist);
-    }
-    int dst = not_found;
-    int dir = 0;
-    while (dst != src){
-        dir = dst;
-        dst = M[dst];
-    }
-    llist_free(q);
-    return src - dir;
-}
-
 int manhattandist(int x, int y, int i, int j){
     int a = abs(i - x);
     int b = abs(j - y);

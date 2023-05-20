@@ -1,18 +1,17 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -O3 -Werror -pedantic -std=c99 -g -fsanitize=address -lm `pkg-config --cflags sdl2 SDL2_image SDL2_ttf`
-LDFLAGS =
-LDLIBS = `pkg-config --libs sdl2 SDL2_image SDL2_ttf`
+CC=gcc
+CFLAGS=-Wall -Wextra -Werror -pedantic -std=c99 -g -fsanitize=address -lm
 
-# Add all the .c files from obj, src, pacman_ai, and pacman_ai/lib to the list of files to compile
-SRC = $(wildcard src/*.c) $(wildcard obj/*.c) $(wildcard pacman_ai/*.c) $(wildcard pacman_ai/lib/*.c) mainmenu.c play.c
-OBJ = $(SRC:.c=.o)
+# Add all the .C files from obj, src and game.c to the list of files to compile
+SRC=$(wildcard src/*.c) $(wildcard obj/*.c) $(wildcard pacman_ai/*.c) $(wildcard pacman_ai/lib/*.c)  main.c
+OBJ=$(SRC:.c=.o)
 
 all: game
 
 game: $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDLIBS)
+	$(CC) $(CFLAGS) -o $@ $^
 
 .PHONY: clean
 
 clean:
 	rm -f $(OBJ) game
+
