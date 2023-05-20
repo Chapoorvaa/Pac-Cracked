@@ -2,9 +2,7 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "play.h"
-
-
+#include "main.h"
 
 void draw_game(SDL_Renderer* renderer)
 {

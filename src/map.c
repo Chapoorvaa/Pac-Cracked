@@ -29,7 +29,9 @@ Map* load_map(char* path){
 	if (f == NULL){
 		return NULL;
 	}
-	fscanf(f, "%[^\n]", map->grid);
+    if (fscanf(f, "%[^\n]", map->grid)!= 1) {
+        return NULL;
+    }
 	fclose(f);
 	return map;
 }

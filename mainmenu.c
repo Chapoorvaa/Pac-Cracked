@@ -1,17 +1,27 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include <unistd.h>
 #include "play.h"
-
+#include <unistd.h>
+#include "main.h"
+#include "obj/ghost.h"
+#include "obj/player.h"
+#include "pacman_ai/lib/linked_list.h"
+#include "pacman_ai/minimax.h"
+#include "src/map.h"
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <termios.h>
+#include "pacman_ai/search.h"
 
 #define MAX_MAPS 10
 #define MAPS_FOLDER "maps"
 #define MAX_FILES 256
 
 char selectedMapPath[512] = "maps/map_1.txt";
+char DEFAULT_MAP[] = {"############################............#............##.####.#####.#.#####.####.##o####.#####.#.#####.####o##.####.#####.#.#####.####.##.........................##.####.##.#######.##.####.##.####.##.#######.##.####.##......##....#....##......#######.##### # #####.######     #.##### # #####.#          #.##         ##.#          #.## ###_### ##.#          #.   #     #   .#          #.## ####### ##.#          #.##         ##.#          #.## ####### ##.#     ######.## ####### ##.#######............#............##.####.#####.#.#####.####.##.####.#####.#.#####.####.##o..##...............##..o####.##.##.#######.##.##.######.##.##.#######.##.##.####......##....#....##......##.##########.#.##########.##.##########.#.##########.##.........................############################"};
+
 
 int difficulty;
 int is_ai;
@@ -23,6 +33,242 @@ void draw_menu(SDL_Renderer* renderer);
 void draw_play_mode(SDL_Renderer* renderer);
 void draw_play_ai(SDL_Renderer* renderer);
 void draw_select_map(SDL_Renderer* renderer);
+
+llist* init_ghosts(int difficulty){
+    // if difficulty is easy init 2 ghosts
+    // if hard init 4
+    // peacefull init 0 
+    llist *ghosts = init_llist();
+    if (difficulty == PEACEFULL){
+        return ghosts;
+    }
+    // The coords (13, 13) should be the coords just under the door of the ghost
+    // house
+    else if (difficulty == EASY){
+        Ghost* blinky = ghostInit("blinky", left, SCATTER, ROW, 0, 13, 13);
+        Ghost* clyde = ghostInit("clyde", left, SCATTER, 0, COL, 13, 13);
+        llist_append(ghosts, blinky);
+        llist_append(ghosts, clyde);
+        return ghosts;
+    }
+    else{
+        Ghost* blinky = ghostInit("blinky", left, SCATTER, ROW, 0, 13, 13);
+        Ghost* clyde = ghostInit("clyde", left, SCATTER, 0, COL, 13, 13);
+        Ghost* inky = ghostInit("inky", right, SCATTER, 0, 0, 13, 13);
+        Ghost* pinky = ghostInit("pinky", right, SCATTER, ROW, COL, 13, 13);
+        llist_append(ghosts, blinky);
+        llist_append(ghosts, clyde);
+        llist_append(ghosts, inky);
+        llist_append(ghosts, pinky);
+        return ghosts;
+    }
+}
+
+// get input from keyboard
+int getch(){
+    struct termios oldtc, newtc;
+    int ch;
+    tcgetattr(STDIN_FILENO, &oldtc);
+    newtc = oldtc;
+    newtc.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newtc);
+    ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldtc);
+    return ch;
+}
+
+// case for arrow keys but not ready yet
+int get_input(){
+    int input = getch();
+    if (input == 27){
+        input = getch();
+        if (input == 91){
+            input = getch();
+            return input;
+        }
+    }
+    return input;
+}
+
+Game *init_game(int is_ai, int difficulty, int map_load){
+    Game *game;
+    game = malloc(sizeof(Game));
+    game->difficulty = difficulty;
+    game->globalGhostMode = SCATTER;
+    game->globalGhostFrightened = 0;
+    game->globalGhostKill = 0;
+    if (map_load != 0){
+        //game->map = load_map("./maps/map_1.txt");
+        Map *map = malloc(sizeof(Map));
+        map->grid = malloc(sizeof(char) * (ROW * COL));
+        map->points = 0;
+        for(size_t i = 0; i < ROW * COL; i++){
+            map->grid[i] = DEFAULT_MAP[i];
+        }
+        game->map = map;
+    }
+    else{
+        game->map = init_map();
+    }
+    game->pacman = init_player();
+    game->ghosts = init_ghosts(difficulty);
+    game->is_ai = is_ai;
+	game->round = 0;
+    return game;
+}
+
+void free_game(Game* game){
+	llist_free(game->ghosts);
+	free_map(game->map);
+	free_player(game->pacman);
+	free(game);	
+}
+
+int game_over(Game* game){
+    if (game->pacman->lives == 0){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
+void updateGhostMode(Game* game){
+    // update ghost mode
+    // update global game mode
+    int gr = game->round;
+    int change = 0;
+    if (gr == 0 || gr == 27 || gr == 54 || gr == 79){
+        game->globalGhostMode = SCATTER;
+        change = 1;
+    }
+    else if (gr == 7 || gr == 34 || gr == 59 || gr == 84){
+        game->globalGhostMode = CHASE;
+        change = 1;
+    }
+    
+    // update ghost mode for each ghost if there is a change
+    for (size_t i = 0; i < game->ghosts->length; i++){
+        Ghost* ghost = llist_use(game->ghosts, i);
+        switch(ghost->mode){
+            case DEAD:
+                // if the ghost is back at his spawn point, change his mode
+                if (ghost->x == ghost->spawnX && ghost->y == ghost->spawnY){
+                    ghost->mode = game->globalGhostMode;
+                }
+                break;
+            case FRIGHTENED:
+                // once the frightened time is over, change the ghost mode
+                if (game->globalGhostFrightened == game->round){
+                    ghost->mode = game->globalGhostMode;
+                }
+                break;
+            case SCATTER:
+                // if the global mode changes, change the ghost mode
+                // or if the timer after a ghost has killed pacman is over
+                if (change || game->globalGhostKill == game->round){
+                    ghost->mode = game->globalGhostMode;
+                }
+                break;
+            case CHASE:
+                // if the global mode changes, change the ghost mode
+                if (change){
+                    ghost->mode = game->globalGhostMode;
+                }
+                break;
+        }
+        //printf("GhostName: %s -> mode : %i, 
+        //targetTiles : %i,%i, direction : %i\n",ghost->name,
+        //ghost->mode, ghost->targetX, ghost->targetY, ghost->direction);
+
+    }
+}
+
+int update(Game* game){
+    // check each entities direction and update x and y values accordingly
+    // update ghosts
+    for (size_t i = 0; i < game->ghosts->length; i++)
+        GhostMove(llist_use(game->ghosts, i), llist_use(game->ghosts, 0),
+                        game->map->grid, game->pacman);
+    // update pacman
+	int x = game->pacman->x;
+	int y = game->pacman->y;
+	int pac_location = y * COL + x;
+    //check if the next position for pacman is valid
+    if (game->map->grid[pac_location + game->pacman->direction] != WALL &&
+        game->map->grid[pac_location + game->pacman->direction] != WALL2){
+        pac_location += game->pacman->direction;
+    }
+	game->pacman->x = pac_location % COL;
+	game->pacman->y = pac_location / COL;
+	for (size_t i = 0; i < game->ghosts->length; i++){
+		Ghost *ghost = llist_use(game->ghosts, i);
+		int ghost_location = ghost->x + COL * ghost->y;
+		// check if pacman and ghost overlap and do what is needed
+		if (ghost_location == pac_location){
+			if (ghost->mode == SCATTER || ghost->mode == CHASE){
+				player_respawn(game->pacman);
+				game->map->points += DEATH;
+                // set the ghosts to scatter for 5 rounds after respawn
+                game->globalGhostKill = game->round + 5;
+                for (size_t j = 0; j < game->ghosts->length; j++){
+                    Ghost* ghost = llist_use(game->ghosts, j);
+                    ghost->mode = SCATTER;
+                }
+				if (game_over(game)){
+					game->map->points += GAME_OVER;
+				}
+                return DEAD;
+			}
+			else{
+				if (ghost->mode == FRIGHTENED){
+					game->map->points += EAT_GHOST;
+					ghost->mode = DEAD;
+				}
+			}
+		}
+	}
+	// update score if needed and remove objects if needed
+	if (game->map->grid[pac_location] != ' '){
+		if (game->map->grid[pac_location] == '.'){
+			game->map->points += TICTAC;
+		}
+		else{
+			game->map->points += POWER_PELLET;
+            // set all ghosts to frightened if not dead
+            for(size_t i = 0; i < game->ghosts->length; i++){
+                Ghost* ghost = llist_use(game->ghosts, i);
+                if (ghost->mode != DEAD){
+                    ghost->mode = FRIGHTENED;
+                    // set the amount of rounds the ghosts will be frightened
+                    game->globalGhostFrightened = game->round + 20;
+                }
+            }
+            game->map->grid[pac_location] = ' ';
+            updateGhostMode(game);
+            game->round++;
+            return POWER_PELLET;
+		}
+		game->map->grid[pac_location] = ' ';
+	}
+    // update the ghost mode
+    updateGhostMode(game);
+	game->round++;
+    return 0;
+}
+
+int all_eaten(Game *game){
+    int f = 0;
+    int i = 0;
+    while (i < ROW * COL && f != 1){
+        char c = game->map->grid[i];
+        if (c == '.' || c == 'o'){
+            f = 1;
+        }
+        i++;
+    }
+    return f;
+}
 
 
 void draw_map(SDL_Renderer* renderer)

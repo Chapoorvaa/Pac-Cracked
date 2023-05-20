@@ -320,8 +320,8 @@ void ghostPathing(Ghost* ghost, Ghost* blinky, char* map,
             }
             else if (strcmp(ghost->name, "inky") == 0)
             {
-                int dpx;
-                int dpy;
+                int dpx = 0 ;
+                int dpy = 0;
                 switch (player->direction){
                     case up:
                         dpx = player->x;
