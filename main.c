@@ -269,17 +269,18 @@ int main(int argc, char** argv){
     int countdown = 10;
     printf("Initiating game...\n");
 	Game* game = init_game(is_ai, difficulty, map_load);
-	gtree* minimax_tree = NULL;
+	//gtree* minimax_tree = NULL;
     printf("Initiating extra assets...\n");
-	if (game->is_ai == 1 && difficulty > 2){
-		minimax_tree = create_tree(game, 6);
-	}
+	//if (game->is_ai == 1 && difficulty > 2){
+	//	minimax_tree = create_tree(game, 6);
+	//}
     int state = 0;
     printf("Starting game...\n");
 	while (game_over(game) == 0 && all_eaten(game) == 1){
     //   .Start Gameplay loop (while not_won):
     //      _Print Board
         printf("Score: %d\n", game->map->points);
+        printf("Lives: %d\n", game->pacman->lives);
         print_map(game->map, game->pacman, game->ghosts);
 		fflush(stdout);
     //      _Update Ghost Direction
@@ -326,18 +327,16 @@ int main(int argc, char** argv){
 			state = update(game);
 		}
 		else{
+            size_t pos = game->pacman->x + game->pacman->y * COL;
             switch (game->difficulty) {
                 case PEACEFULL:
-                    game->pacman->direction = searchdumb(game);
-                    printf("%d", game->pacman->direction);
+                    game->pacman->direction = Bellman(game, pos);
                     break;
                 case EASY:
-                    game->pacman->direction = searchdumb(game);                   
+                    game->pacman->direction = Bellman(game, pos);                   
                     break;
                 case HARD:
-			        minimax_tree = minimax(minimax_tree);
-                    Game *ga = minimax_tree->key;
-		        	game->pacman = ga->pacman;  
+                    game->pacman->direction = Bellman(game, pos);
                     break;
             }
             
@@ -377,13 +376,18 @@ int main(int argc, char** argv){
             break;
         }
 		// Makes loop sleep for 1s
-		sleep(1);
+		//sleep(1);
 	}
-    printf("Game over...\n");
-    printf("Score: %d\n", game->map->points);
-    if (minimax_tree != NULL){
-	    free_minimax(minimax_tree);
+    if (game->pacman->lives == 0){
+        printf("Game over...\n");
     }
+    else{
+        printf("YOU WIN!\n");
+    }
+    printf("Score: %d\n", game->map->points);
+    //if (minimax_tree != NULL){
+	//    free_minimax(minimax_tree);
+    //}
     // - When game done ask if player wants to save map
 	// - Ask for save file name TODO
 	char name[128];

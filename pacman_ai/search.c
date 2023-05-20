@@ -16,22 +16,105 @@
 #define NOT_VISITED -5
 #define VISITED 1
 
-int *form_adjlist(int vertex, Map* map){
+int *form_adjlist(){
     int* adj = calloc(4, sizeof(int));
-    if (map->grid[vertex + UP] != WALL && map->grid[vertex + UP] != WALL2){
-        adj[0] = UP;
-    }
-        if (map->grid[vertex + LEFT] != WALL && map->grid[vertex + LEFT] != WALL2){
-        adj[1] = LEFT;
-    }
-    if (map->grid[vertex + DOWN] != WALL && map->grid[vertex + DOWN] != WALL2){
-        adj[2] = DOWN;
-    }
-    if (map->grid[vertex + RIGHT] != WALL && map->grid[vertex + RIGHT] != WALL2){
-        adj[3] = RIGHT;
-    }
+    adj[0] = UP;
+    adj[1] = LEFT;
+    adj[2] = DOWN;
+    adj[3] = RIGHT;
     return adj;
 }
+
+int convert(Ghost* g){
+    switch (g->direction) {
+        case up:
+            return UP;
+        case down:
+            return DOWN;
+        case left:
+            return LEFT;
+        case right:
+            return RIGHT;
+    }
+    return 0;
+}
+
+int find_cost(Game* game, int pos){
+    for (size_t i = 0; i < game->ghosts->length; i++){
+        Ghost* g = llist_use(game->ghosts, i);
+        int n = convert(g);
+        int p = g->x + g->y * COL;       
+        for (int i = 0; i < 3; i++){
+            if (p == pos){
+                return 10000;
+            }
+            p += n;
+        }
+    }
+    if (game->map->grid[pos] == ' '){
+        return 10;
+    }
+    if (game->map->grid[pos] == '#' || game->map->grid[pos] == '_'){
+        return 100000;
+    }
+    return 1;
+}
+
+int Bellman(Game *game, size_t src){
+    char* map = game->map->grid;
+    int dist[COL * ROW];
+    int p[COL * ROW];
+    for (int i = 0; i < COL * ROW; i++){
+        dist[i] = INT_MAX;
+        p[i] = -1;
+    }
+    int n = COL * ROW;
+    p[src] = 0;
+    dist[src] = 0;
+    while (n > 0){
+        for (int x = 0; x < ROW * COL; x++){
+            if (dist[x] != INT_MAX && map[x] != '#' && map[x] != '_'){
+                int adjlist[4];
+                adjlist[0] = UP;
+                adjlist[1] = DOWN;
+                adjlist[2] = LEFT;
+                adjlist[3] = RIGHT;
+                for (int y = 0; y < 4; y++){
+                    int k = x + adjlist[y];
+                    if (k < 0 || k >= ROW * COL){
+                        continue;
+                    }
+                    if (map[k] == '#' || map[k] == '_'){
+                        continue;
+                    }
+                    int cost = find_cost(game, k);
+                    if (dist[x] + cost < dist[k]){
+                        dist[k] = dist[x] + cost;
+                        if (p[x] == 0){
+                            p[k]= adjlist[y];
+                        }
+                        else{
+                            p[k] = p[x];
+                        }
+                    }
+                }
+            }
+        }
+        n--;
+    }
+    int smallest = INT_MAX;
+    int d = 0;
+    for (size_t i = 0; i < COL * ROW; i++){
+        if (map[i] != ' ' && map[i] != '#' && map[i] != '_'){
+            if (dist[i] < smallest){
+                d = p[i];
+                smallest = dist[i];
+            }
+        }
+    }
+    return d;
+}
+
 
 int bfs(Game *game){
     llist *q = init_llist();
