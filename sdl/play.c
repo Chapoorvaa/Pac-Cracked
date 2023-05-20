@@ -4,7 +4,7 @@
 #include <SDL2/SDL_image.h>
 #include "play.h"
 
-void draw_mappng(SDL_Renderer* renderer)
+void draw_game(SDL_Renderer* renderer)
 {
     SDL_RenderClear(renderer);
     

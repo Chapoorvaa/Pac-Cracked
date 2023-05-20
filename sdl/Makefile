@@ -8,11 +8,11 @@ LDLIBS = `pkg-config --libs sdl2 SDL2_image SDL2_ttf`
 
 all: mainmenu
 
-SRC = mainmenu.c 
+SRC = mainmenu.c play.c
 OBJ = ${SRC:.c=.o}
 EXE = ${SRC:.c=}
 
-main: mainmenu.o 
+mainmenu: mainmenu.o play.o
 
 
 .PHONY: clean

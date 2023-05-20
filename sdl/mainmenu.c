@@ -17,35 +17,6 @@ int is_ai;
 int window_width, window_height;
 int image_width, image_height;
 
-void draw_mappng(SDL_Renderer* renderer)
-{
-    SDL_RenderClear(renderer);
-    
-    SDL_Surface* map_surface = IMG_Load("Default_Map.png");  // function arthur 
-    SDL_Texture* map_texture = SDL_CreateTextureFromSurface(renderer, map_surface);
-    SDL_FreeSurface(map_surface);
-
-    int map_x = 0;
-    int map_y = 0;
-    int map_height = 928 ;
-    int map_width = 864 ;
-
-    SDL_Rect map_rect = { map_x, map_y, map_height,map_width};
-    SDL_RenderCopy(renderer, map_texture, NULL, &map_rect);
-    SDL_RenderPresent(renderer);
-
-    SDL_DestroyTexture(map_texture);
-
-    SDL_Event event;
-    while (SDL_WaitEvent(&event)) {
-        
-        if (event.type == SDL_QUIT) {
-            break;
-        } 
-    }
-
-}
-
 
 void draw_menu(SDL_Renderer* renderer);
 void draw_play_mode(SDL_Renderer* renderer);
@@ -98,7 +69,7 @@ void draw_map(SDL_Renderer* renderer)
             else if (x >= me_x && x <= me_x + buttonwidth &&
              y >= ai_y && y <= ai_y + buttonheight) {
                 SDL_SetRenderDrawColor(renderer,0,0,0,255);
-                draw_mappng(renderer);
+                draw_game(renderer);
             }
             
         
@@ -262,7 +233,7 @@ void draw_select_map(SDL_Renderer* renderer)
              y >= 0 && y <= 864)
             {
                 SDL_SetRenderDrawColor(renderer,0,0,0,255);
-                draw_mappng(renderer);
+                draw_game(renderer);
             }
         }
     }
