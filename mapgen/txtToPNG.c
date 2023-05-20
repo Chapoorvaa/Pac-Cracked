@@ -64,7 +64,583 @@ char* nbAdjacentWalls(char* grid, int x, int y, int* nbWalls, int* house)
 
 int chooseTile(char* tiles, int nbWalls, int house){
     //TODO: Choose the correct png to use depending on the adjacent tiles
-    return -1;
+    switch(nbWalls){
+        case 1:
+            if (house)
+                return -1;
+            if (tiles[1])
+                return 14;
+            else if (tiles[3])
+                return 13;
+            else if (tiles[5])
+                return 12;
+            else if (tiles[7])
+                return 11;
+            else
+                return -1;
+            break;
+        case 2:
+            // Two cases if the house is adjacent to the tile
+            if (tiles[3] == 2 && tiles[5])
+                return 13;
+            if (tiles[5] == 2 && tiles[3])
+                return 12;
+
+            if(tiles[0]){
+                if (tiles[1])
+                    return 11;
+                else if(tiles[3])
+                    return 12;
+                else
+                    return -1;
+            }
+            if (tiles[1]){
+                if (tiles[2])
+                    return 11;
+                else if (tiles[3])
+                    return 6;
+                else if (tiles[5])
+                    return 5;
+                else if (tiles[7])
+                    return 15;
+                else
+                    return -1;
+            }
+            if (tiles[2]){
+                if (tiles[5])
+                    return 13;
+                else
+                    return -1;
+            }
+            if (tiles[3]){
+                if (tiles[5])
+                    if (house) // case if the tile is the house tile
+                        return 10;
+                    else
+                        return 9;
+                else if (tiles[6])
+                    return 12;
+                else if (tiles[7])
+                    return 8;
+                else
+                    return -1;
+            }
+            if (tiles[5]){
+                if (tiles[7])
+                    return 7;
+                else if (tiles[8])
+                    return 13;
+                else
+                    return -1;
+            }
+            if (tiles[7]){
+                if (tiles[6] || tiles[8])
+                    return 14;
+                else
+                    return -1;
+            }
+            break;
+        case 3:
+            if (house)
+                return -1;
+            if (tiles[0]){
+                if (tiles[1]){
+                    if (tiles[2])
+                        return 11;
+                    else if (tiles[3])
+                        return 6;
+                    else if (tiles[5])
+                        return 5;
+                    else if (tiles[7])
+                        return 15;
+                    else
+                        return -1;
+                }
+                else if (tiles[3]){
+                    if (tiles[5])
+                        return 9;
+                    else if (tiles[6])
+                        return 12;
+                    else if (tiles[7])
+                        return 8;
+                    else
+                        return -1;
+                }
+                else
+                    return -1;
+            }
+            if (tiles[1]){
+                if (tiles[2]){
+                    if (tiles[3])
+                        return 6;
+                    else if (tiles[5])
+                        return 5;
+                    else if (tiles[7])
+                        return 15;
+                    else
+                        return -1;
+                }
+                else if (tiles[3]){
+                    if (tiles[5])
+                        return 4;
+                    else if (tiles[6])
+                        return 6;
+                    else if (tiles[7])
+                        return 3;
+                    else
+                        return -1;
+                }
+                else if (tiles[5]){
+                    if (tiles[7])
+                        return 2;
+                    else if (tiles[8])
+                        return 5;
+                    else
+                        return -1;
+                }
+                else if ((tiles[6] && tiles[7]) || (tiles[7] && tiles[8]))
+                    return 15;
+                else
+                    return -1;
+            }
+            if (tiles[2]){
+                if (tiles[3] && tiles[5])
+                    return 9;
+                else if (tiles[5] && tiles[7])
+                    return 7;
+                else if (tiles[5] && tiles[8])
+                    return 13;
+                else
+                    return -1;
+            }
+            if (tiles[3]){
+                if (tiles[5]){
+                    if (tiles[6])
+                        return 9;
+                    else if (tiles[7])
+                        return 1;
+                    else if (tiles[8])
+                        return 9;
+                }
+                else if ((tiles[6] && tiles[7]) || (tiles[7] && tiles[8]))
+                    return 8;
+                else
+                    return -1;
+            }
+            if (tiles[5]){
+                if (tiles[6] && tiles[7] || tiles[7] && tiles[8])
+                    return 7;
+                else
+                    return -1;
+            }
+            if (tiles[6] && tiles[7] && tiles[8])
+                return 14;
+            break;
+        case 4:
+            if (house)
+                return -1;
+            if (tiles[0]){
+                if (tiles[1]){
+                    if (tiles[2]){
+                        if (tiles[3])
+                            return 6;
+                        else if (tiles[5])
+                            return 5;
+                        else if (tiles[7])
+                            return 15;
+                        else
+                            return -1;
+                    }
+                    else if (tiles[3]){
+                        if (tiles[5])
+                            return 4;
+                        else if (tiles[6])
+                            return 6;
+                        else if (tiles[7])
+                            return 3;
+                        else
+                            return -1;
+                    }
+                    else if (tiles[5]){
+                        if (tiles[7])
+                            return 2;
+                        else if (tiles[8])
+                            return 5;
+                        else
+                            return -1;
+                    }
+                    else if ((tiles[6] && tiles[7]) || (tiles[7] && tiles[8]))
+                        return 15;
+                    else
+                        return -1;
+                }
+                else if (tiles[2] && tiles[3] && tiles[5])
+                    return 9;
+                else if (tiles[3]){
+                    if (tiles[5]){
+                        if (tiles[6])
+                            return 9;
+                        else if (tiles[7])
+                            return 1;
+                        else if (tiles[8])
+                            return 9;
+                        else
+                            return -1;
+                    }
+                    else if (tiles[6] && tiles[7] || tiles[7] && tiles[8])
+                        return 8;
+                    else
+                        return -1;
+                }
+                else
+                    return -1;
+            }
+            else if (tiles[1]){
+                if (tiles[2]){
+                    if (tiles[3]){
+                        if (tiles[5])
+                            return 4;
+                        else if (tiles[6])
+                            return 6;
+                        else if (tiles[7])
+                            return 3;
+                        else
+                            return -1;
+                    }
+                    else if (tiles[5]){
+                        if (tiles[7])
+                            return 2;
+                        else if (tiles[8])
+                            return 5;
+                        else
+                            return -1;
+                    }
+                    else if ((tiles[6] && tiles[7]) || (tiles[7] && tiles[8]))
+                        return 15;
+                    else
+                        return -1;
+                }
+                else if (tiles[3]){
+                    if (tiles[5]){
+                        if (tiles[6])
+                            return 4;
+                        else if (tiles[7])
+                            return 16; // special case crossroads
+                        else if (tiles[8])
+                            return 4;
+                        else
+                            return -1;
+                    }
+                    else if ((tiles[6] && tiles[7]) || (tiles[7] && tiles[8]))
+                        return 3;
+                }
+                else if (tiles[5]){
+                    if (tiles[6] && tiles[7] || tiles[7] && tiles[8])
+                        return 2;
+                    else
+                        return -1;
+                }
+                else if (tiles[6] && tiles[7] && tiles[8])
+                    return 15;
+                else
+                    return -1;
+            }
+            else if (tiles[3]){
+                if (tiles[5]){
+                    if (tiles[6]){
+                        if (tiles[7])
+                            return 1;
+                        else if (tiles[8])
+                            return 9;
+                        else
+                            return -1;
+                    }
+                    else if (tiles[7] && tiles[8])
+                        return 1;
+                    else
+                        return -1;
+                }
+                else if (tiles[6] && tiles[7] && tiles[8])
+                    return 8;
+                else
+                    return -1;
+            }
+            else if (tiles[5] && tiles[6] && tiles[7] && tiles[8])
+                return 7;
+            else
+                return -1;
+            break;
+        case 5:
+            if (house)
+                return -1;
+            if (tiles[0]){
+                if (tiles[1]){
+                    if (tiles[2]){
+                        if (tiles[3]){
+                            if (tiles[5])
+                                return 9;
+                            else if (tiles[6])
+                                return 6;
+                            else if (tiles[7])
+                                return 3;
+                            else
+                                return -1;
+                        }
+                        else if (tiles[5]){
+                            if (tiles[7])
+                                return 2;
+                            else if (tiles[8])
+                                return 5;
+                            else
+                                return -1;
+                        }
+                        else if ((tiles[6] && tiles[7]) ||
+                                (tiles[7] && tiles[8]))
+                            return 15;
+                        else
+                            return -1;
+                    }
+                    else if (tiles[3]){
+                        if (tiles[5]){
+                            if (tiles[6])
+                                return 4;
+                            else if (tiles[7])
+                                return 16; // special case crossroads
+                            else if (tiles[8])
+                                return 4;
+                            else
+                                return -1;
+                        }
+                        else if (tiles[6] && tiles[7])
+                            return 15;
+                        else if (tile[7] && tiles[8])
+                            return 2;
+                        else
+                            return -1;
+                    }
+                    else if (tiles[5]){
+                        if (tiles[6] && tiles[7])
+                            return 3;
+                        else if (tiles[7] && tiles[8])
+                            return 15;
+                        else
+                            return -1;
+                    }
+                    else if (tiles[6] && tiles[7] && tiles[8])
+                        return 15;
+                    else
+                        return -1;
+                }
+                else if (tiles[2]){
+                    if (tiles[3]){
+                        if (tiles[5]){
+                            if (tiles[6])
+                                return 9;
+                            else if (tiles[7])
+                                return 1;
+                            else if (tiles[8])
+                                return 9;
+                            else
+                                return -1;
+                        }
+                        else
+                            return -1;
+                    }
+                    else
+                        return -1;
+                }
+                else if (tiles[3]){
+                    if (tiles[5]){
+                        if (tiles[6]){
+                            if (tiles[7])
+                                return 1;
+                            else if (tiles[8])
+                                return 9;
+                            else
+                                return -1;
+                        }
+                        else if (tiles[7] && tiles[8])
+                            return 1;
+                        else
+                            return -1;
+                    }
+                    else if (tiles[6] && tiles[7] && tiles[8])
+                        return 8;
+                    else
+                        return -1;
+                }
+                else 
+                    return -1;
+            }
+            else if (tiles[1]){
+                if (tiles[2]){
+                    if (tiles[3]){
+                        if (tiles[5]){
+                            if (tiles[6])
+                                return 4;
+                            else if (tiles[7])
+                                return 16; // special case crossroads
+                            else if (tiles[8])
+                                return 4;
+                            else
+                                return -1;
+                        }
+                        else if (tiles[6]){
+                            if (tiles[7])
+                                return 2;
+                            else
+                                return -1;
+                        }
+                        else if (tiles[7] && tiles[8])
+                            return 2;
+                        else
+                            return -1;
+                    }
+                    else if (tiles[5]){
+                        if (tiles[6] && tiles[7])
+                            return 3;
+                        else if (tiles[7] && tiles[8])
+                            return 15;
+                        else
+                            return -1;
+                    }
+                    else if (tiles[6] && tiles[7] && tiles[8])
+                        return 15;
+                    else
+                        return -1;
+                }
+                else if (tiles[3]){
+                    if (tiles[5]){
+                        if (tiles[6] && tiles[7])
+                            return 16; // special case crossroads
+                        else if (tiles[6] && tiles[8])
+                            return 4;
+                        else if (tiles[7] && tiles[8])
+                            return 16; // special case crossroads
+                        else
+                            return -1;
+                    }
+                    else if (tiles[6] && tiles[7] && tiles[8])
+                        return 2;
+                    else
+                        return -1;
+                }
+                else if (tiles[5] && tiles[6] && tiles[7] && tiles[8])
+                    return 3;
+                else
+                    return -1;
+            }
+            else if (tiles[2]){
+                if (tiles[3]){
+                    if (tiles[5]){
+                        if (tiles[6]){
+                            if (tiles[7])
+                                return 1;
+                            else if (tiles[8])
+                                return 9;
+                            else
+                                return -1;
+                        }
+                        else if (tiles[7] && tiles[8])
+                            return 1;
+                        else
+                            return -1;
+                    }
+                    else 
+                        return -1;
+                }
+                else if (tiles[5]){
+                    if (tiles[6] && tiles[7] && tiles[8])
+                        return 7;
+                    else
+                        return -1;
+                }
+                else
+                    return -1;
+            }
+            else if (tiles[3]){
+                if (tiles[5]){
+                    if (tiles[6] && tiles[7] && tiles[8])
+                        return 9;
+                    else
+                        return -1;
+                }
+                else
+                    return -1;
+            }
+            else
+                return -1;
+            break;
+        case 6:
+            if (house)
+                return -1;
+            if (!tiles[0]){
+                if (!tiles[1])
+                    return 9;
+                else if (!tiles[2])
+                    return 4;
+                else if (!tiles[3])
+                    return 15;
+                else if (!tiles[6])
+                    return 2;
+                else if (!tiles[8])
+                    return 16; // special case crossroads
+                else
+                    return -1;
+            }
+            else if (!tiles[1] && !tiles[2])
+                return 9;
+            else if (!tiles[2]){
+                if (!tiles[5])
+                    return 15;
+                else if (!tiles[6])
+                    return 16;
+                else if (!tiles[8])
+                    return 3;
+                else
+                    return -1;
+            }
+            else if (!tiles[3] && !tiles[6])
+                return 15;
+            else if (!tiles[5] && !tiles[8])
+                return 15;
+            else if (!tiles[6]){
+                if (!tiles[7])
+                    return 9;
+                else if (!tiles[8])
+                    return 1;
+                else
+                    return -1;
+            }
+            else if (!tiles[7] && !tiles[8])
+                return 9;
+            else
+                return -1;
+            break;
+        case 7:
+            if (house)
+                return -1;
+            if (!tiles[0])
+                return 6;
+            else if (!tiles[1] || !tiles[7])
+                return 9;
+            else if (!tiles[2])
+                return 5;
+            else if (!tiles[3] || !tiles[5])
+                return 15;
+            else if (!tiles[6])
+                return 8;
+            else if (!tiles[8])
+                return 7;
+            else
+                return -1;
+            break;
+        case 8:
+            if (house)
+                return -1;
+            return 0;
+            break;
+    }
 }
 
 void combinePNGs(const char* outputFilename, Map* map,
@@ -91,8 +667,12 @@ void combinePNGs(const char* outputFilename, Map* map,
     SDL_Surface* UCornerBottom = IMG_Load("UCornerBottom.png");
     SDL_Surface* UCornerLeft = IMG_Load("UCornerLeft.png");
     SDL_Surface* UCornerRight = IMG_Load("UCornerRight.png");
+    SDL_Surface* UCornerTop = IMG_Load("UCornerTop.png");
     SDL_Surface* HouseWall = IMG_Load("HouseWall.png");
-    SDL_Surface* 1DIntersection = IMG_Load("1DIntersection.png");
+    SDL_Surface* 1DIntersectionTop = IMG_Load("1DIntersectionTop.png");
+    SDL_Surface* 1DIntersectionBottom = IMG_Load("1DIntersectionBottom.png");
+    SDL_Surface* 1DIntersectionLeft = IMG_Load("1DIntersectionLeft.png");
+    SDL_Surface* 1DIntersectionRight = IMG_Load("1DIntersectionRight.png");
 
     // Get the width and height of the surface to be created
     int combinedWidth = ROW * SPRITE_SIZE;
