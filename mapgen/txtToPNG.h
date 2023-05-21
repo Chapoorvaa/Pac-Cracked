@@ -2,7 +2,6 @@
 #define TXT_TO_PNG
 
 // Here we will take charge of transforming map in txt format to a png format
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "stdio.h"

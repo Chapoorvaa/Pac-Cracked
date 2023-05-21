@@ -10,25 +10,18 @@ int main(int argc, char** argv){
         printf("Usage: %s <input file> <output file>\n", argv[0]);
         return 1;
     }
-    //char* input = argv[1];
+    char* input = argv[1];
     char* output = argv[2];
-    //char* buffer = NULL;
-    /*size_t size = 0;
-    FILE* file = fopen(input, "r");
-    if(file == NULL){
-        printf("Error: could not open file %s\n", input);
-        return 1;
+    char* buffer = malloc(sizeof(char) * 29 * 27);
+    FILE* f = fopen(input, "r");
+    if (f == NULL)
+        errx(1, "couldn't find the file");
+    if (fscanf(f, "%[^\n]", buffer)!= 1) {
+        errx(1, "error reading file");
     }
-    fseek(file, 0, SEEK_END);
-    size = ftell(file);
-    rewind(file);
-    buffer = malloc((size + 1) * sizeof(*buffer));
-    fread(buffer, size, 1, file);
-    buffer[size] = '\0';
-    fclose(file);*/
-    char* buffer = DEFAULT_MAP;
+    fclose(f);
     combinePNGs(output,buffer);
     
-    //free(buffer);
+    free(buffer);
     return 0;
 }

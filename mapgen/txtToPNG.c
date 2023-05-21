@@ -53,13 +53,13 @@ int chooseTile(char* tiles, int nbWalls, int house){
             if (house)
                 return -1;
             if (tiles[1])
-                return 14;
-            else if (tiles[3])
-                return 13;
-            else if (tiles[5])
-                return 12;
-            else if (tiles[7])
                 return 11;
+            else if (tiles[3])
+                return 12;
+            else if (tiles[5])
+                return 13;
+            else if (tiles[7])
+                return 14;
             else
                 return -1;
             break;
@@ -329,6 +329,12 @@ int chooseTile(char* tiles, int nbWalls, int house){
                 else
                     return -1;
             }
+            else if (tiles[2] && tiles[3] && tiles[5] && tiles[6])
+                return 9;
+            else if (tiles[2] && tiles[3] && tiles[5] && tiles[7])
+                return 1;
+            else if (tiles[2] && tiles[3] && tiles[5] && tiles[8])
+                return 9;
             else if (tiles[3]){
                 if (tiles[5]){
                     if (tiles[6]){
@@ -607,21 +613,21 @@ void combinePNGs(const char* outputFilename, char* map)
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, 0);
     
     // Load the image into memory using SDL_image library function
-    SDL_Surface* VerticalWall = IMG_Load("VerticalWall.png");
-    SDL_Surface* HorizontalWall = IMG_Load("HorizontalWall.png");
-    SDL_Surface* CornerBottomLeft = IMG_Load("CornerBottomLeft.png");
-    SDL_Surface* CornerBottomRight = IMG_Load("CornerBottomRight.png");
-    SDL_Surface* CornerTopLeft = IMG_Load("CornerTopLeft.png");
-    SDL_Surface* CornerTopRight = IMG_Load("CornerTopRight.png");
-    SDL_Surface* UCornerBottom = IMG_Load("UCornerBottom.png");
-    SDL_Surface* UCornerLeft = IMG_Load("UCornerLeft.png");
-    SDL_Surface* UCornerRight = IMG_Load("UCornerRight.png");
-    SDL_Surface* UCornerTop = IMG_Load("UCornerTop.png");
-    SDL_Surface* HouseWall = IMG_Load("HouseWall.png");
-    SDL_Surface* DIntersectionTop = IMG_Load("1DIntersectionTop.png");
-    SDL_Surface* DIntersectionBottom = IMG_Load("1DIntersectionBottom.png");
-    SDL_Surface* DIntersectionLeft = IMG_Load("1DIntersectionLeft.png");
-    SDL_Surface* DIntersectionRight = IMG_Load("1DIntersectionRight.png");
+    SDL_Surface* VerticalWall = IMG_Load("./tiles/VerticalWall.png");
+    SDL_Surface* HorizontalWall = IMG_Load("./tiles/HorizontalWall.png");
+    SDL_Surface* CornerBottomLeft = IMG_Load("./tiles/CornerBottomLeft.png");
+    SDL_Surface* CornerBottomRight = IMG_Load("./tiles/CornerBottomRight.png");
+    SDL_Surface* CornerTopLeft = IMG_Load("./tiles/CornerTopLeft.png");
+    SDL_Surface* CornerTopRight = IMG_Load("./tiles/CornerTopRight.png");
+    SDL_Surface* UCornerBottom = IMG_Load("./tiles/UCornerBottom.png");
+    SDL_Surface* UCornerLeft = IMG_Load("./tiles/UCornerLeft.png");
+    SDL_Surface* UCornerRight = IMG_Load("./tiles/UCornerRight.png");
+    SDL_Surface* UCornerTop = IMG_Load("./tiles/UCornerTop.png");
+    SDL_Surface* HouseWall = IMG_Load("./tiles/HouseWall.png");
+    SDL_Surface* DIntersectionTop = IMG_Load("./tiles/1DIntersectionTop.png");
+    SDL_Surface* DIntersectionBottom = IMG_Load("./tiles/1DIntersectionBottom.png");
+    SDL_Surface* DIntersectionLeft = IMG_Load("./tiles/1DIntersectionLeft.png");
+    SDL_Surface* DIntersectionRight = IMG_Load("./tiles/1DIntersectionRight.png");
 
     // Get the width and height of the surface to be created
     int combinedWidth = COL * SPRITE_SIZE;
@@ -634,7 +640,6 @@ void combinePNGs(const char* outputFilename, char* map)
     SDL_Rect dstRect = {0, 0, 0, 0};
     int globalX = 0;
     int globalY = 0;
-    //TODO : 
     //Go through the map and assign the correct sprite at the correct location
     // -> loop through each row
     // -> loop through each column of the row
@@ -647,43 +652,43 @@ void combinePNGs(const char* outputFilename, char* map)
     int* nbWalls = malloc(sizeof(int));
     for (int y = 0; y < ROW; y++){
         for (int x = 0; x < COL; x++){
-            printf("x = %d, y = %d\n", x, y);
             if (grid[y * COL + x] == WALL || grid[y * COL + x] == WALL2){
                 int house = 0;
                 char *adjacentTiles = nbAdjacentWalls(grid, x, y, nbWalls,
                         &house);
-                if (adjacentTiles[0])
+                printf("x: %d, y: %d\n", x, y);
+                if(adjacentTiles[0])
                     printf("X");
                 else
                     printf("O");
-                if (adjacentTiles[1])
+                if(adjacentTiles[1])
                     printf("X");
                 else
                     printf("O");
-                if (adjacentTiles[2])
+                if(adjacentTiles[2])
                     printf("X");
                 else
                     printf("O");
                 printf("\n");
-                if (adjacentTiles[3])
+                if(adjacentTiles[3])
                     printf("X");
                 else
                     printf("O");
                 printf("X");
-                if (adjacentTiles[5])
+                if(adjacentTiles[5])
                     printf("X");
                 else
                     printf("O");
                 printf("\n");
-                if (adjacentTiles[6])
+                if(adjacentTiles[6])
                     printf("X");
                 else
                     printf("O");
-                if (adjacentTiles[7])
+                if(adjacentTiles[7])
                     printf("X");
                 else
                     printf("O");
-                if (adjacentTiles[8])
+                if(adjacentTiles[8])
                     printf("X");
                 else
                     printf("O");
@@ -852,14 +857,16 @@ void combinePNGs(const char* outputFilename, char* map)
                         errx(1, "Invalid tile");
                         break;
                 }
-                if (globalX >= combinedWidth){
-                    globalX = 0;
-                    globalY += SPRITE_SIZE;
-                }
+                
                 free(adjacentTiles);
             }
             else
                 globalX += SPRITE_SIZE;
+            
+            if (globalX >= combinedWidth){
+                    globalX = 0;
+                    globalY += SPRITE_SIZE;
+            }
         }
     }
     free(nbWalls);
