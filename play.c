@@ -4,7 +4,11 @@
 #include <SDL2/SDL_image.h>
 #include "main.h"
 
-void draw_game(SDL_Renderer* renderer)
+void draw_final(SDL_Renderer* renderer);
+void draw_save(SDL_Renderer* renderer);
+
+
+void draw_game(SDL_Renderer* renderer, int difficulty,int is_ai, int map_gen)
 {
     SDL_RenderClear(renderer);
     
@@ -22,5 +26,23 @@ void draw_game(SDL_Renderer* renderer)
     SDL_RenderPresent(renderer);
 
     SDL_DestroyTexture(map_texture);
+
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)) {
+    
+        if (event.type == SDL_QUIT) {
+            break;
+        } 
+        else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            if (map_gen==1 && is_ai < 2 && difficulty <5)
+            {
+                draw_save(renderer);
+            }
+            else 
+            {
+                draw_final(renderer);
+            }
+        }
+    }
 
 }

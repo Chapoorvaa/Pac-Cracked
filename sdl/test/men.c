@@ -374,6 +374,79 @@ void draw_select_map(SDL_Renderer* renderer)
 }*/
 
 
+void draw_save(SDL_Renderer* renderer)
+{
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer,11,63,114,255);
+    SDL_Surface* play_surface = IMG_Load("buttons/save_map.png");
+    SDL_Texture* play_texture = SDL_CreateTextureFromSurface(renderer, play_surface);
+    SDL_FreeSurface(play_surface);
+
+    SDL_Surface* easy_surface = IMG_Load("buttons/yes.png");
+    SDL_Texture* easy_texture = SDL_CreateTextureFromSurface(renderer, easy_surface);
+    SDL_FreeSurface(easy_surface);
+
+    SDL_Surface* medium_surface = IMG_Load("buttons/no.png");
+    SDL_Texture* medium_texture = SDL_CreateTextureFromSurface(renderer, medium_surface);
+    SDL_FreeSurface(medium_surface);
+
+    SDL_QueryTexture(play_texture, NULL, NULL, &image_width, &image_height);
+    SDL_Rect play_rect = { 0, 0, image_width, image_height};
+
+    int buttonwidth = 300;
+    int buttonheight = 300;
+
+    int width, height;
+    SDL_GetRendererOutputSize(renderer, &width, &height);
+
+    int ai_x = 200;  // Center horizontally on the left side
+    int ai_y = (height - buttonheight) / 2;
+
+    int me_x = 700;  // Center horizontally on the right side
+    int me_y = (height - buttonheight) / 2;
+    
+    SDL_RenderCopy(renderer, play_texture, NULL, &play_rect);
+
+    SDL_RenderCopy(renderer, easy_texture, NULL, &(SDL_Rect){ai_x, ai_y, buttonwidth, buttonheight});
+    SDL_RenderCopy(renderer, medium_texture, NULL, &(SDL_Rect){me_x, me_y, buttonwidth, buttonheight});
+
+    
+    SDL_RenderPresent(renderer);
+
+    int back_x = (width - 300) / 2;
+    int back_y = (((height - 60) / 2)*1.75)+10;
+
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            break;
+        } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            int x = event.button.x;
+            int y = event.button.y;
+            if (x >= back_x && x <= back_x + 300 &&
+                y >= back_y && y <= back_y + 60) {
+                 SDL_RenderClear(renderer);
+                SDL_SetRenderDrawColor(renderer, 11, 63, 114, 255);
+                SDL_RenderPresent(renderer);
+            } else if (x >= ai_x && x <= ai_x + buttonwidth &&
+                       y >= ai_y && y <= ai_y + buttonheight) {
+                // TODO: Handle AI button click
+                SDL_RenderClear(renderer);
+                SDL_SetRenderDrawColor(renderer, 11, 63, 114, 255);
+                SDL_RenderPresent(renderer);
+            } else if (x >= me_x && x <= me_x + buttonwidth &&
+                       y >= me_y && y <= me_y + buttonheight) {
+                // TODO: Handle ME button click
+                SDL_RenderClear(renderer);
+                SDL_SetRenderDrawColor(renderer, 11, 63, 114, 255);
+                SDL_RenderPresent(renderer);
+            }
+        }
+    }
+
+}
+
+/*
 void draw_select_map(SDL_Renderer* renderer)
 {
     SDL_RenderClear(renderer);
@@ -451,7 +524,7 @@ void draw_select_map(SDL_Renderer* renderer)
             }
         }
     }
-}
+}*/
 
 int main() {
     // Initialize SDL
@@ -507,7 +580,7 @@ int main() {
             else if (x >= select_map_x && x <= select_map_x + BUTTON_WIDTH &&
              y >= select_map_y && y <= select_map_y + BUTTON_HEIGHT) {
             // Handle Select Map button click
-            draw_select_map(renderer);
+            draw_save(renderer);
             }
             else if (x >= high_score_x && x <= high_score_x + BUTTON_WIDTH &&
              y >= high_score_y && y <= high_score_y + BUTTON_HEIGHT) {

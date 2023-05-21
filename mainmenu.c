@@ -1,7 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include "play.h"
 #include <unistd.h>
 #include "main.h"
 #include "obj/ghost.h"
@@ -14,6 +13,8 @@
 #include <stdio.h>
 #include <termios.h>
 #include "pacman_ai/search.h"
+#include "play.h"
+
 
 #define MAX_MAPS 10
 #define MAPS_FOLDER "maps"
@@ -22,9 +23,10 @@
 char selectedMapPath[512] = "maps/map_1.txt";
 char DEFAULT_MAP[] = {"############################............#............##.####.#####.#.#####.####.##o####.#####.#.#####.####o##.####.#####.#.#####.####.##.........................##.####.##.#######.##.####.##.####.##.#######.##.####.##......##....#....##......#######.##### # #####.######     #.##### # #####.#          #.##         ##.#          #.## ###_### ##.#          #.   #     #   .#          #.## ####### ##.#          #.##         ##.#          #.## ####### ##.#     ######.## ####### ##.#######............#............##.####.#####.#.#####.####.##.####.#####.#.#####.####.##o..##...............##..o####.##.##.#######.##.##.######.##.##.#######.##.##.####......##....#....##......##.##########.#.##########.##.##########.#.##########.##.........................############################"};
 
-
 int difficulty;
 int is_ai;
+int map_gen; // if ==  1 true
+int high_score = 0;
 int window_width, window_height;
 int image_width, image_height;
 
@@ -270,10 +272,134 @@ int all_eaten(Game *game){
     return f;
 }
 
+void draw_final(SDL_Renderer* renderer)
+{
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer,11,63,114,255);
+
+    SDL_Surface* sm_surface = IMG_Load("menuimg/final.png");
+    SDL_Texture* sm_texture = SDL_CreateTextureFromSurface(renderer, sm_surface);
+    SDL_FreeSurface(sm_surface);
+
+    SDL_QueryTexture(sm_texture, NULL, NULL, &image_width, &image_height);
+    SDL_QueryTexture(sm_texture, NULL, NULL, &image_width, &image_height);
+    SDL_Rect sm_rect = { 0, 0, image_width, image_height};
+    
+    SDL_RenderCopy(renderer, sm_texture, NULL, &sm_rect);
+
+    TTF_Font* font = TTF_OpenFont("Paperkind.ttf", 100); 
+    SDL_Color text_color = { 255, 255, 255, 255 }; 
+
+    char score_text[15]; // Assuming the high score will be within 10 digits
+    sprintf(score_text, "%d", high_score); /// needs to change it to score =)
+
+    int text_width, text_height;
+    TTF_SizeText(font, score_text, &text_width, &text_height);
+
+    int screen_width, screen_height;
+    SDL_GetRendererOutputSize(renderer, &screen_width, &screen_height);
+
+    int text_x = (screen_width - text_width) / 2;
+    int text_y = (screen_height - text_height) / 2;
+
+    SDL_Surface* text_surface = TTF_RenderText_Solid(font, score_text, text_color);
+    SDL_Texture* text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+    SDL_FreeSurface(text_surface);
+
+    SDL_Rect text_rect = { text_x, text_y, text_width, text_height };
+
+    SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+    SDL_DestroyTexture(text_texture);
+    TTF_CloseFont(font);
+
+    SDL_RenderPresent(renderer);
+
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)) {
+    
+        if (event.type == SDL_QUIT) {
+            break;
+        } 
+        else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            int x = event.button.x;
+            int y = event.button.y;
+            if (x >= 86 && x <= 358 &&
+                y >= 726 && y <= 798) {
+                draw_menu(renderer); 
+            }
+            else if (x >= 479 && x <= 721 &&
+             y >= 726 && y <= 798)
+            {
+                SDL_SetRenderDrawColor(renderer,0,0,0,255);
+                draw_game(renderer,difficulty,is_ai,map_gen);
+            }
+            else if (x>= 887 && x<= 1031&& y>= 726 &&y<=798)
+            {
+                SDL_DestroyTexture(sm_texture);
+                SDL_DestroyTexture(text_texture);
+                SDL_DestroyRenderer(renderer);
+                IMG_Quit();
+                SDL_Quit();
+                exit(0);
+            }
+            
+        }
+    }
+
+
+}
+
+void draw_save(SDL_Renderer* renderer)
+{
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer,11,63,114,255);
+    SDL_Surface* save_surface = IMG_Load("menuimg/save_map.png");
+    SDL_Texture* save_texture = SDL_CreateTextureFromSurface(renderer, save_surface);
+    SDL_FreeSurface(save_surface);
+
+    SDL_QueryTexture(save_texture, NULL, NULL, &image_width, &image_height);
+    SDL_Rect save_rect = { 0, 0, image_width, image_height};
+    
+    SDL_RenderCopy(renderer, save_texture, NULL, &save_rect);
+
+    int buttonwidth = 300;
+    int buttonheight = 300;
+
+    int yes_y = (window_height - buttonheight) / 2;
+    int no_x = 700;
+    int yes_x = 200;
+
+    SDL_RenderPresent(renderer);
+
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)) {
+        
+        if (event.type == SDL_QUIT) {
+            SDL_DestroyTexture(save_texture);
+            SDL_DestroyRenderer(renderer);
+            IMG_Quit();
+            SDL_Quit();
+            exit(0);
+        } 
+        else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            int x = event.button.x;
+            int y = event.button.y;
+            if (x >= yes_x && x <= yes_x + buttonwidth &&
+                y >= yes_y && y <= yes_y + buttonheight) {
+                draw_final(renderer);
+            }
+            else if (x >= no_x && x <= no_x + buttonwidth &&
+             y >= yes_y && y <= yes_y + buttonheight) {
+                //function to save the map generated in .txt
+                draw_final(renderer);
+            }
+        }
+    }
+    SDL_DestroyTexture(save_texture);
+}
 
 void draw_map(SDL_Renderer* renderer)
 {
-
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer,11,63,114,255);
     SDL_Surface* play_surface = IMG_Load("menuimg/map.png");
@@ -300,7 +426,12 @@ void draw_map(SDL_Renderer* renderer)
     while (SDL_WaitEvent(&event)) {
         
         if (event.type == SDL_QUIT) {
-            break;
+            SDL_DestroyTexture(play_texture);
+            SDL_DestroyRenderer(renderer);
+            IMG_Quit();
+            SDL_Quit();
+            exit(0);
+            
         } 
         else if (event.type == SDL_MOUSEBUTTONDOWN) {
             int x = event.button.x;
@@ -311,17 +442,18 @@ void draw_map(SDL_Renderer* renderer)
             }
             else if (x >= ai_x && x <= ai_x + buttonwidth &&
                 y >= ai_y && y <= ai_y + buttonheight) {
+                map_gen = 0;
                 draw_select_map(renderer);
             }
             else if (x >= me_x && x <= me_x + buttonwidth &&
              y >= ai_y && y <= ai_y + buttonheight) {
                 SDL_SetRenderDrawColor(renderer,0,0,0,255);
-                draw_game(renderer);
+                map_gen = 1;
+                draw_game(renderer,difficulty,is_ai,map_gen);
             }
-            
-        
         }
     }
+    SDL_DestroyTexture(play_texture);
 }
 
 void draw_play_ai(SDL_Renderer* renderer)
@@ -352,7 +484,12 @@ void draw_play_ai(SDL_Renderer* renderer)
     while (SDL_WaitEvent(&event)) {
         
         if (event.type == SDL_QUIT) {
-            break;
+            SDL_DestroyTexture(play_texture);
+            SDL_DestroyRenderer(renderer);
+            IMG_Quit();
+            SDL_Quit();
+            exit(0);
+            
         } 
         else if (event.type == SDL_MOUSEBUTTONDOWN) {
             int x = event.button.x;
@@ -363,21 +500,17 @@ void draw_play_ai(SDL_Renderer* renderer)
             }
             else if (x >= ai_x && x <= ai_x + buttonwidth &&
                 y >= ai_y && y <= ai_y + buttonheight) {
-                // TODO : update in the game it's ai 
                 is_ai = 1;
                 draw_map(renderer);
             }
             else if (x >= me_x && x <= me_x + buttonwidth &&
              y >= ai_y && y <= ai_y + buttonheight) {
-                //TODO : update in the game it's human playing
                 is_ai = 0;
                 draw_map(renderer);
             }
-            
-        
         }
     }
-
+    SDL_DestroyTexture(play_texture);
 }
 
 void draw_play_mode(SDL_Renderer* renderer)
@@ -411,7 +544,12 @@ void draw_play_mode(SDL_Renderer* renderer)
     while (SDL_WaitEvent(&event)) {
         
         if (event.type == SDL_QUIT) {
-            break;
+            SDL_DestroyTexture(play_texture);
+            SDL_DestroyRenderer(renderer);
+            IMG_Quit();
+            SDL_Quit();
+            exit(0);
+            
         } 
         else if (event.type == SDL_MOUSEBUTTONDOWN) {
             int x = event.button.x;
@@ -422,21 +560,22 @@ void draw_play_mode(SDL_Renderer* renderer)
             }
             else if (x >= easy_x && x <= easy_x + buttonwidth &&
                 y >= easy_y && y <= easy_y + buttonheight) {
-                // TODO : PEACEFULL
+                difficulty = PEACEFULL;
                 draw_play_ai(renderer);
             }
             else if (x >= easy_x && x <= easy_x + buttonwidth &&
              y >= medium_y && y <= medium_y + buttonheight) {
-                //TODO : easy
+                difficulty = EASY;
                 draw_play_ai(renderer);
             }
             else if (x >= easy_x && x <= easy_x + buttonwidth &&
              y >= hard_y && y <= hard_y + buttonheight) {
-                // TODO: hard
+                difficulty = HARD;
                 draw_play_ai(renderer);
             }
         }
     }
+    SDL_DestroyTexture(play_texture);
 
 
 }
@@ -467,23 +606,80 @@ void draw_select_map(SDL_Renderer* renderer)
     while (SDL_WaitEvent(&event)) {
     
         if (event.type == SDL_QUIT) {
-            break;
+            SDL_DestroyTexture(sm_texture);
+            SDL_DestroyRenderer(renderer);
+            IMG_Quit();
+            SDL_Quit();
+            exit(0);
+            
         } 
         else if (event.type == SDL_MOUSEBUTTONDOWN) {
             int x = event.button.x;
             int y = event.button.y;
             if (x >= back_x && x <= back_x + 300 &&
                 y >= back_y && y <= back_y + 60) {
-                draw_menu(renderer); // for testing purposes
+                draw_map(renderer); 
             }
             else if (x >= 0 && x <= 1200 &&
              y >= 0 && y <= 864)
             {
                 SDL_SetRenderDrawColor(renderer,0,0,0,255);
-                draw_game(renderer);
+                draw_game(renderer,difficulty,is_ai,map_gen);
             }
         }
     }
+    SDL_DestroyTexture(sm_texture);
+   
+}
+
+
+void draw_select_map_menu(SDL_Renderer* renderer)
+{
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer, 11, 63, 114, 255);
+    SDL_RenderPresent(renderer);
+
+    SDL_Surface* sm_surface = IMG_Load("menuimg/button.png");
+    SDL_Texture* sm_texture = SDL_CreateTextureFromSurface(renderer, sm_surface);
+    SDL_FreeSurface(sm_surface);
+
+    SDL_QueryTexture(sm_texture, NULL, NULL, &image_width, &image_height);
+    SDL_QueryTexture(sm_texture, NULL, NULL, &image_width, &image_height);
+    SDL_Rect sm_rect = { 0, 0, image_width, image_height};
+    
+    SDL_RenderCopy(renderer, sm_texture, NULL, &sm_rect);
+    int back_x = 450;
+    int back_y = 713; 
+
+    // todo : draw the files buttons
+
+
+    SDL_RenderPresent(renderer);
+    SDL_Event event;
+    while (SDL_WaitEvent(&event)) {
+    
+        if (event.type == SDL_QUIT) {
+            SDL_DestroyTexture(sm_texture);
+            SDL_DestroyRenderer(renderer);
+            IMG_Quit();
+            SDL_Quit();
+            exit(0);
+        } 
+        else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            int x = event.button.x;
+            int y = event.button.y;
+            if (x >= back_x && x <= back_x + 300 &&
+                y >= back_y && y <= back_y + 60) {
+                draw_menu(renderer); 
+            }
+            else if (x >= 0 && x <= 1200 &&
+             y >= 0 && y <= 864)
+            {
+                //todo : function to put map in an array
+            }
+        }
+    }
+    SDL_DestroyTexture(sm_texture);
    
 }
 
@@ -505,14 +701,42 @@ void draw_high_score(SDL_Renderer* renderer)
     int back_x = 450;
     int back_y = 713; 
 
-    // TODO : display the high score
+    TTF_Font* font = TTF_OpenFont("Paperkind.ttf", 100); 
+    SDL_Color text_color = { 255, 255, 255, 255 }; 
+
+    char score_text[15]; // Assuming the high score will be within 10 digits
+    sprintf(score_text, "%d", high_score);
+
+    int text_width, text_height;
+    TTF_SizeText(font, score_text, &text_width, &text_height);
+
+    int screen_width, screen_height;
+    SDL_GetRendererOutputSize(renderer, &screen_width, &screen_height);
+
+    int text_x = (screen_width - text_width) / 2;
+    int text_y = (screen_height - text_height) / 2;
+
+    SDL_Surface* text_surface = TTF_RenderText_Solid(font, score_text, text_color);
+    SDL_Texture* text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+    SDL_FreeSurface(text_surface);
+
+    SDL_Rect text_rect = { text_x, text_y, text_width, text_height };
+
+    SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+    SDL_DestroyTexture(text_texture);
+    TTF_CloseFont(font);
 
     SDL_RenderPresent(renderer);
     SDL_Event event;
     while (SDL_WaitEvent(&event)) {
     
         if (event.type == SDL_QUIT) {
-            break;
+            SDL_DestroyTexture(sm_texture);
+            SDL_DestroyTexture(text_texture);
+            SDL_DestroyRenderer(renderer);
+            IMG_Quit();
+            SDL_Quit();
+            exit(0);
         } 
         else if (event.type == SDL_MOUSEBUTTONDOWN) {
             int x = event.button.x;
@@ -523,9 +747,9 @@ void draw_high_score(SDL_Renderer* renderer)
             }
         }
     }
+    SDL_DestroyTexture(sm_texture);
    
 }
-
 
 void draw_help(SDL_Renderer* renderer)
 {
@@ -559,6 +783,7 @@ void draw_help(SDL_Renderer* renderer)
             }
         }
     }
+    SDL_DestroyTexture(help_texture);
 }
 
 void draw_about(SDL_Renderer* renderer)
@@ -593,6 +818,7 @@ void draw_about(SDL_Renderer* renderer)
             }
         }
     }
+    SDL_DestroyTexture(about_texture);
 }
 
 void draw_menu(SDL_Renderer* renderer)
@@ -639,7 +865,7 @@ void draw_menu(SDL_Renderer* renderer)
             else if (x >= play_x && x <= play_x + buttonwidth &&
              y >= select_map_y && y <= select_map_y + buttonheight) {
                 // Handle Select Map button click
-                draw_select_map(renderer);
+                draw_select_map_menu(renderer);
             }
             else if (x >= play_x && x <= play_x + buttonwidth &&
              y >= high_score_y && y <= high_score_y + buttonheight) {
