@@ -25,8 +25,9 @@ char DEFAULT_MAP[] = {"############################............#............##.#
 
 int difficulty;
 int is_ai;
-int map_gen; // if ==  1 true
+int map_load; // if ==  1 true
 int high_score = 0;
+extern int score;
 int window_width, window_height;
 int image_width, image_height;
 
@@ -291,10 +292,15 @@ void draw_final(SDL_Renderer* renderer)
     SDL_Color text_color = { 255, 255, 255, 255 }; 
 
     char score_text[15]; // Assuming the high score will be within 10 digits
-    sprintf(score_text, "%d", high_score); /// needs to change it to score =)
+    sprintf(score_text, "%d", score); /// needs to change it to score =)
 
     int text_width, text_height;
     TTF_SizeText(font, score_text, &text_width, &text_height);
+
+    if (score>high_score)
+    {
+        high_score = score;
+    }
 
     int screen_width, screen_height;
     SDL_GetRendererOutputSize(renderer, &screen_width, &screen_height);
@@ -331,13 +337,15 @@ void draw_final(SDL_Renderer* renderer)
              y >= 726 && y <= 798)
             {
                 SDL_SetRenderDrawColor(renderer,0,0,0,255);
-                draw_game(renderer,difficulty,is_ai,map_gen);
+                Game* game = init_game(is_ai, difficulty,map_load);
+                draw_game(renderer,game,map_load);
             }
             else if (x>= 887 && x<= 1031&& y>= 726 &&y<=798)
             {
                 SDL_DestroyTexture(sm_texture);
                 SDL_DestroyTexture(text_texture);
                 SDL_DestroyRenderer(renderer);
+                TTF_Quit();
                 IMG_Quit();
                 SDL_Quit();
                 exit(0);
@@ -349,7 +357,7 @@ void draw_final(SDL_Renderer* renderer)
 
 }
 
-void draw_save(SDL_Renderer* renderer)
+void draw_save(SDL_Renderer* renderer)  // probably need to add the game argument 
 {
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer,11,63,114,255);
@@ -377,6 +385,7 @@ void draw_save(SDL_Renderer* renderer)
         if (event.type == SDL_QUIT) {
             SDL_DestroyTexture(save_texture);
             SDL_DestroyRenderer(renderer);
+            TTF_Quit();
             IMG_Quit();
             SDL_Quit();
             exit(0);
@@ -391,6 +400,7 @@ void draw_save(SDL_Renderer* renderer)
             else if (x >= no_x && x <= no_x + buttonwidth &&
              y >= yes_y && y <= yes_y + buttonheight) {
                 //function to save the map generated in .txt
+                // save_map(game->map, name);
                 draw_final(renderer);
             }
         }
@@ -428,6 +438,7 @@ void draw_map(SDL_Renderer* renderer)
         if (event.type == SDL_QUIT) {
             SDL_DestroyTexture(play_texture);
             SDL_DestroyRenderer(renderer);
+            TTF_Quit();
             IMG_Quit();
             SDL_Quit();
             exit(0);
@@ -442,14 +453,15 @@ void draw_map(SDL_Renderer* renderer)
             }
             else if (x >= ai_x && x <= ai_x + buttonwidth &&
                 y >= ai_y && y <= ai_y + buttonheight) {
-                map_gen = 0;
+                map_load = 1;
                 draw_select_map(renderer);
             }
             else if (x >= me_x && x <= me_x + buttonwidth &&
              y >= ai_y && y <= ai_y + buttonheight) {
                 SDL_SetRenderDrawColor(renderer,0,0,0,255);
-                map_gen = 1;
-                draw_game(renderer,difficulty,is_ai,map_gen);
+                map_load = 0;
+                Game* game = init_game(is_ai, difficulty,map_load);
+                draw_game(renderer,game,map_load);
             }
         }
     }
@@ -486,6 +498,7 @@ void draw_play_ai(SDL_Renderer* renderer)
         if (event.type == SDL_QUIT) {
             SDL_DestroyTexture(play_texture);
             SDL_DestroyRenderer(renderer);
+            TTF_Quit();
             IMG_Quit();
             SDL_Quit();
             exit(0);
@@ -546,6 +559,7 @@ void draw_play_mode(SDL_Renderer* renderer)
         if (event.type == SDL_QUIT) {
             SDL_DestroyTexture(play_texture);
             SDL_DestroyRenderer(renderer);
+            TTF_Quit();
             IMG_Quit();
             SDL_Quit();
             exit(0);
@@ -608,6 +622,7 @@ void draw_select_map(SDL_Renderer* renderer)
         if (event.type == SDL_QUIT) {
             SDL_DestroyTexture(sm_texture);
             SDL_DestroyRenderer(renderer);
+            TTF_Quit();
             IMG_Quit();
             SDL_Quit();
             exit(0);
@@ -624,7 +639,8 @@ void draw_select_map(SDL_Renderer* renderer)
              y >= 0 && y <= 864)
             {
                 SDL_SetRenderDrawColor(renderer,0,0,0,255);
-                draw_game(renderer,difficulty,is_ai,map_gen);
+                Game* game = init_game(is_ai, difficulty,map_load);
+                draw_game(renderer,game,map_load);
             }
         }
     }
@@ -661,6 +677,7 @@ void draw_select_map_menu(SDL_Renderer* renderer)
         if (event.type == SDL_QUIT) {
             SDL_DestroyTexture(sm_texture);
             SDL_DestroyRenderer(renderer);
+            TTF_Quit();
             IMG_Quit();
             SDL_Quit();
             exit(0);
@@ -734,6 +751,7 @@ void draw_high_score(SDL_Renderer* renderer)
             SDL_DestroyTexture(sm_texture);
             SDL_DestroyTexture(text_texture);
             SDL_DestroyRenderer(renderer);
+            TTF_Quit();
             IMG_Quit();
             SDL_Quit();
             exit(0);
@@ -772,7 +790,12 @@ void draw_help(SDL_Renderer* renderer)
     while (SDL_WaitEvent(&event)) {
         
         if (event.type == SDL_QUIT) {
-            break;
+            SDL_DestroyTexture(help_texture);
+            SDL_DestroyRenderer(renderer);
+            TTF_Quit();
+            IMG_Quit();
+            SDL_Quit();
+            exit(0);
         } 
         else if (event.type == SDL_MOUSEBUTTONDOWN) {
             int x = event.button.x;
@@ -807,7 +830,12 @@ void draw_about(SDL_Renderer* renderer)
     while (SDL_WaitEvent(&event)) {
         
         if (event.type == SDL_QUIT) {
-            break;
+            SDL_DestroyTexture(about_texture);
+            SDL_DestroyRenderer(renderer);
+            TTF_Quit();
+            IMG_Quit();
+            SDL_Quit();
+            exit(0);
         } 
         else if (event.type == SDL_MOUSEBUTTONDOWN) {
             int x = event.button.x;
@@ -885,6 +913,7 @@ void draw_menu(SDL_Renderer* renderer)
              y >= quit_y && y <= quit_y + buttonheight) {
                 SDL_DestroyTexture(menu_texture);
                 SDL_DestroyRenderer(renderer);
+                TTF_Quit();
                 IMG_Quit();
                 SDL_Quit();
                 exit(0);
