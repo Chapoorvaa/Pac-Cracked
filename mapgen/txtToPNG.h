@@ -3,12 +3,14 @@
 
 // Here we will take charge of transforming map in txt format to a png format
 
-#include "../src/map.h"
-
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include "stdio.h"
+#include "stddef.h"
+#include <err.h>
 // From the 10 default sprites build the map in PNG format with the map in 
 // an array
-void combinePNGs(const char* outputFilename, const char** map, int width, 
-        int height);
+void combinePNGs(const char* outputFilename, char* map);
 
 // get the number of adjacent walls and builds and array of the adjacent walls
 // returns a heap allocated char array of length 9 representing 3x3 grid of
