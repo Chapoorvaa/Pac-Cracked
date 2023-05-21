@@ -28,8 +28,9 @@ int is_ai;
 int map_load; // if ==  1 true
 int high_score = 0;
 extern int score;
+extern int game_won;
 int window_width, window_height;
-int image_width, image_height;
+extern int image_width, image_height;
 
 
 void draw_menu(SDL_Renderer* renderer);
@@ -278,6 +279,38 @@ void draw_final(SDL_Renderer* renderer)
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer,11,63,114,255);
 
+    if (game_won == 0)
+    {
+        SDL_Surface* sm_surface = IMG_Load("menuimg/game_over.png");
+        SDL_Texture* sm_texture = SDL_CreateTextureFromSurface(renderer, sm_surface);
+        SDL_FreeSurface(sm_surface);
+
+        SDL_QueryTexture(sm_texture, NULL, NULL, &image_width, &image_height);
+        SDL_QueryTexture(sm_texture, NULL, NULL, &image_width, &image_height);
+        SDL_Rect sm_rect = { 0, 0, image_width, image_height};
+        
+        SDL_RenderCopy(renderer, sm_texture, NULL, &sm_rect);
+        SDL_RenderPresent(renderer);
+        sleep(2);
+        SDL_DestroyTexture(sm_texture);
+    }
+    else
+    {
+        SDL_Surface* sm_surface = IMG_Load("menuimg/game_won.png");
+        SDL_Texture* sm_texture = SDL_CreateTextureFromSurface(renderer, sm_surface);
+        SDL_FreeSurface(sm_surface);
+
+        SDL_QueryTexture(sm_texture, NULL, NULL, &image_width, &image_height);
+        SDL_QueryTexture(sm_texture, NULL, NULL, &image_width, &image_height);
+        SDL_Rect sm_rect = { 0, 0, image_width, image_height};
+        
+        SDL_RenderCopy(renderer, sm_texture, NULL, &sm_rect);
+        SDL_RenderPresent(renderer);
+        sleep(2);
+        SDL_DestroyTexture(sm_texture);
+
+    }
+
     SDL_Surface* sm_surface = IMG_Load("menuimg/final.png");
     SDL_Texture* sm_texture = SDL_CreateTextureFromSurface(renderer, sm_surface);
     SDL_FreeSurface(sm_surface);
@@ -355,57 +388,6 @@ void draw_final(SDL_Renderer* renderer)
     }
 
 
-}
-
-void draw_save(SDL_Renderer* renderer)  // probably need to add the game argument 
-{
-    SDL_RenderClear(renderer);
-    SDL_SetRenderDrawColor(renderer,11,63,114,255);
-    SDL_Surface* save_surface = IMG_Load("menuimg/save_map.png");
-    SDL_Texture* save_texture = SDL_CreateTextureFromSurface(renderer, save_surface);
-    SDL_FreeSurface(save_surface);
-
-    SDL_QueryTexture(save_texture, NULL, NULL, &image_width, &image_height);
-    SDL_Rect save_rect = { 0, 0, image_width, image_height};
-    
-    SDL_RenderCopy(renderer, save_texture, NULL, &save_rect);
-
-    int buttonwidth = 300;
-    int buttonheight = 300;
-
-    int yes_y = (window_height - buttonheight) / 2;
-    int no_x = 700;
-    int yes_x = 200;
-
-    SDL_RenderPresent(renderer);
-
-    SDL_Event event;
-    while (SDL_WaitEvent(&event)) {
-        
-        if (event.type == SDL_QUIT) {
-            SDL_DestroyTexture(save_texture);
-            SDL_DestroyRenderer(renderer);
-            TTF_Quit();
-            IMG_Quit();
-            SDL_Quit();
-            exit(0);
-        } 
-        else if (event.type == SDL_MOUSEBUTTONDOWN) {
-            int x = event.button.x;
-            int y = event.button.y;
-            if (x >= yes_x && x <= yes_x + buttonwidth &&
-                y >= yes_y && y <= yes_y + buttonheight) {
-                draw_final(renderer);
-            }
-            else if (x >= no_x && x <= no_x + buttonwidth &&
-             y >= yes_y && y <= yes_y + buttonheight) {
-                //function to save the map generated in .txt
-                // save_map(game->map, name);
-                draw_final(renderer);
-            }
-        }
-    }
-    SDL_DestroyTexture(save_texture);
 }
 
 void draw_map(SDL_Renderer* renderer)
