@@ -9,8 +9,6 @@
 #include "pacman_ai/search.h"
 
 #define TILE_SIZE 32
-#define TT '.'
-#define PP 'o'
 enum{HAUT,BAS,GAUCHE,DROITE};
 
 int score = 0;
@@ -124,8 +122,8 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
 
     int map_x = 0;
     int map_y = 0;
-    int map_height = 928 ;
-    int map_width = 864 ;
+    int map_height = 864;
+    int map_width = 928 ;
     
     SDL_Rect map_rect = { map_x, map_y, map_height,map_width};
     SDL_RenderCopy(renderer, map_texture, NULL, &map_rect);
@@ -161,10 +159,8 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
     char c; 
 
     while (game_over(game) == 0 && all_eaten(game) == 1){
-
-        
-               
-        position.x= (game->pacman->x*TILE_SIZE); //30
+    
+        position.x= (game->pacman->x*TILE_SIZE);//30
         position.y= (game->pacman->y*TILE_SIZE); //31
         SDL_RenderCopy(renderer, map_texture, NULL, &map_rect);
         SDL_RenderCopy(renderer, pac_texture, NULL, &position);
@@ -191,9 +187,7 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
 
             }
         } 
-        
-        
-
+    
         SDL_RenderPresent(renderer);  
         
         if (game->is_ai != 1){
@@ -259,6 +253,7 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
                     game->pacman->direction = Bellman(game, pos);
                     break;
             }
+            sleep(0.1);
             
             state = update(game);
 		} 

@@ -594,9 +594,6 @@ void draw_select_map(SDL_Renderer* renderer)
     int back_x = 450;
     int back_y = 713; 
 
-    // todo : draw the files buttons
-
-
     SDL_RenderPresent(renderer);
     SDL_Event event;
     while (SDL_WaitEvent(&event)) {
@@ -618,7 +615,7 @@ void draw_select_map(SDL_Renderer* renderer)
                 draw_map(renderer); 
             }
             else if (x >= 0 && x <= 1200 &&
-             y >= 0 && y <= 864)
+             y >= 0 && y <= 928)
             {
                 SDL_SetRenderDrawColor(renderer,0,0,0,255);
                 Game* game = init_game(is_ai, difficulty,map_load);
@@ -649,8 +646,6 @@ void draw_select_map_menu(SDL_Renderer* renderer)
     int back_x = 450;
     int back_y = 713; 
 
-    // todo : draw the files buttons
-
 
     SDL_RenderPresent(renderer);
     SDL_Event event;
@@ -668,11 +663,11 @@ void draw_select_map_menu(SDL_Renderer* renderer)
             int x = event.button.x;
             int y = event.button.y;
             if (x >= back_x && x <= back_x + 300 &&
-                y >= back_y && y <= back_y + 60) {
+                y >= back_y && y <= back_y + 135) {
                 draw_menu(renderer); 
             }
             else if (x >= 0 && x <= 1200 &&
-             y >= 0 && y <= 864)
+             y >= 0 && y <= 928)
             {
                 //todo : function to put map in an array
             }
@@ -742,7 +737,7 @@ void draw_high_score(SDL_Renderer* renderer)
             int x = event.button.x;
             int y = event.button.y;
             if (x >= back_x && x <= back_x + 300 &&
-                y >= back_y && y <= back_y + 60) {
+                y >= back_y && y <= back_y + 135) {
                 draw_menu(renderer); 
             }
         }
@@ -918,7 +913,7 @@ int main() {
         "Pac-Cracked",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
-        1200, 864,
+        1200, 928,
         SDL_WINDOW_SHOWN  
     );
 
