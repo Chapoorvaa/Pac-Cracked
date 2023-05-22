@@ -10,6 +10,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include "pacman_ai/search.h"
+#include <time.h>
 
 char DEFAULT_MAP[] = {"############################............#............##.####.#####.#.#####.####.##o####.#####.#.#####.####o##.####.#####.#.#####.####.##.........................##.####.##.#######.##.####.##.####.##.#######.##.####.##......##....#....##......#######.##### # #####.######     #.##### # #####.#          #.##         ##.#          #.## ###_### ##.#          #.   #     #   .#          #.## ####### ##.#          #.##         ##.#          #.## ####### ##.#     ######.## ####### ##.#######............#............##.####.#####.#.#####.####.##.####.#####.#.#####.####.##o..##...............##..o####.##.##.#######.##.##.######.##.##.#######.##.##.####......##....#....##......##.##########.#.##########.##.##########.#.##########.##.........................############################"};
 
@@ -67,6 +68,18 @@ int get_input(){
         }
     }
     return input;
+}
+
+void randomMapPath(char* pathPng, char* pathTxt){
+    // pathPng and pathTxt should be heap allocated
+    srand(time(NULL));
+    int r = rand() % 6 + 1;
+    // path -> ./png/map_x.png
+    // with x a value between 1 and 6
+    sprintf(pathPng, "./png/map_%d.png", r);
+    // path -> ./maps/map_x.txt
+    // with x a value between 1 and 6
+    sprintf(pathTxt, "./maps/map_%d.txt", r);
 }
 
 Game *init_game(int is_ai, int difficulty, int map_load){

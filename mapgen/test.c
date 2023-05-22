@@ -58,7 +58,7 @@ void combinePNGs(const char* outputFilename, const char** inputFilenames, int nu
 }
 
 int main() {
-    const char* inputFilenames[] = {"HorizontalWall.png", "CornerBottomLeft.png", "VerticalWall.png"};
+    const char* inputFilenames[] = {"./tiles/HorizontalWall.png", "./tiles/CornerBottomLeft.png", "./tiles/VerticalWall.png"};
     int numInputFiles = sizeof(inputFilenames) / sizeof(char*);
     combinePNGs("combined.png", inputFilenames, numInputFiles);
     return 0;
