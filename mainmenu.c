@@ -106,13 +106,16 @@ Game *init_game(int is_ai, int difficulty, int map_load){
     game->globalGhostKill = 0;
     if (map_load != 0){
         //game->map = load_map("./maps/map_1.txt");
+        /*
         Map *map = malloc(sizeof(Map));
         map->grid = malloc(sizeof(char) * (ROW * COL));
         map->points = 0;
         for(size_t i = 0; i < ROW * COL; i++){
             map->grid[i] = DEFAULT_MAP[i];
         }
-        game->map = map;
+        game->map = map;*/
+        game->map = init_map();
+
     }
     else{
         game->map = init_map();
