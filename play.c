@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <errno.h>  
+#include "mapgen/txtToPNG.h"
 
 #include "main.h"
 #include "pacman_ai/search.h"
@@ -41,6 +42,7 @@ int msleep(long msec)
 
     return res;
 }
+
 
 void draw_save(SDL_Renderer* renderer,Game* game)
 {
@@ -313,24 +315,20 @@ void Move(SDL_Rect* pos,int direction)
 } 
 
 
+
 void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
 {
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-    SDL_Surface* map_surface= IMG_Load("png/map1.png");
+    SDL_Surface* map_surface= map_surface= IMG_Load("Default_Map.png");
     
-    if (map_load == 0) {
-        map_surface = IMG_Load("png/map1.png");
+    if (map_load == 0)
+    {
+        char* path =(char*)malloc(20 * sizeof(char));
+        sprintf(path, "png/map%d.png", game->map->num);
+        map_surface= IMG_Load(path);
+        free(path);
     }
-    /*
-    else
-    {   // function mapgeneration thomas 
-        // function arthur
-        // map_surface = IMG_Load("fichierarthur");
-        //map_surface = IMG_Load("png/map1.png");
-
-    }*/
     SDL_Texture* map_texture = SDL_CreateTextureFromSurface(renderer, map_surface);
     SDL_FreeSurface(map_surface);
 
@@ -376,16 +374,6 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
     while (game_over(game) == 0 && all_eaten(game) == 1){
 
         SDL_RenderCopy(renderer, map_texture, NULL, &map_rect);
-        if(game->difficulty>0)
-        {
-            draw_Ghost(renderer,game,&position);
-        } 
-        position.x= (game->pacman->x*TILE_SIZE);
-        position.y= (game->pacman->y*TILE_SIZE); 
-        pac_texture = SDL_CreateTextureFromSurface(renderer, pacmanActuel);
-        SDL_RenderCopy(renderer, pac_texture, NULL, &position);  
-                         
-        
         for (int i = 0;i<COL;i++)
         {
             for(int j=0;j<ROW;j++)
@@ -410,6 +398,15 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
 
             }
         } 
+        if(game->difficulty>0)
+        {
+            draw_Ghost(renderer,game,&position);
+        } 
+        position.x= (game->pacman->x*TILE_SIZE);
+        position.y= (game->pacman->y*TILE_SIZE); 
+        pac_texture = SDL_CreateTextureFromSurface(renderer, pacmanActuel);
+        SDL_RenderCopy(renderer, pac_texture, NULL, &position);  
+        ///
     
         SDL_RenderPresent(renderer);  
         
@@ -432,6 +429,7 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
                         case SDLK_UP:
                             if (game->map->grid[pos + UP] != WALL && game->map->grid[pos + UP] != WALL2){
                                 game->pacman->direction = UP; 
+
                                 pacmanActuel = pacman[HAUT];
                                 Move(&position,HAUT);
                             }
@@ -480,7 +478,7 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
                     game->pacman->direction = Bellman(game, pos);
                     break;
             }
-            msleep(200);// need to be modified
+            msleep(10);// need to be modified
             
             state = update(game);
             if (game->pacman->direction == RIGHT)

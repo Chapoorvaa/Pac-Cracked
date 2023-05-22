@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <termios.h>
 #include "pacman_ai/search.h"
+#include "mapgen/txtToPNG.h"
 #include "play.h"
 
 
@@ -93,6 +94,8 @@ int get_input(){
     }
     return input;
 }
+
+
 
 Game *init_game(int is_ai, int difficulty, int map_load){
     Game *game;
@@ -273,6 +276,8 @@ int all_eaten(Game *game){
     }
     return f;
 }
+
+
 
 void draw_final(SDL_Renderer* renderer)
 {
