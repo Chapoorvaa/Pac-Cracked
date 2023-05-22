@@ -136,6 +136,7 @@ void draw_Ghost(SDL_Renderer* renderer,Game* game,SDL_Rect* position)
 
    
     SDL_Surface* fghost = IMG_Load("characters/fghost.png");
+    SDL_Surface* dghost = IMG_Load("characters/dghost.png");
 
     for(size_t i = 0; i < game->ghosts->length;i++){
         Ghost* ghost = llist_use(game->ghosts, i);
@@ -145,22 +146,22 @@ void draw_Ghost(SDL_Renderer* renderer,Game* game,SDL_Rect* position)
                 position->x= (ghost->x*TILE_SIZE);
                 position->y= (ghost->y* TILE_SIZE);
                 if (i == 0){
-                    blinkyActuel= fghost;
+                    blinkyActuel= dghost;
                     blinky_texture = SDL_CreateTextureFromSurface(renderer, blinkyActuel);
                     SDL_RenderCopy(renderer, blinky_texture, NULL, position);
                 }
                 else if (i == 1){
-                    clydeActuel= fghost;
+                    clydeActuel= dghost;
                     clyde_texture = SDL_CreateTextureFromSurface(renderer, clydeActuel);
                     SDL_RenderCopy(renderer, clyde_texture, NULL, position);
                 }
                 else if (i == 2){
-                    pinkyActuel= fghost;
+                    pinkyActuel= dghost;
                     pinky_texture = SDL_CreateTextureFromSurface(renderer, pinkyActuel);
                     SDL_RenderCopy(renderer, pinky_texture, NULL, position);
                 }
                 else if (i == 3){
-                    inkyActuel= fghost;
+                    inkyActuel= dghost;
                     inky_texture = SDL_CreateTextureFromSurface(renderer, inkyActuel);
                     SDL_RenderCopy(renderer, inky_texture, NULL, position);
                 }
@@ -379,7 +380,7 @@ void draw_Ghost(SDL_Renderer* renderer,Game* game,SDL_Rect* position)
         SDL_FreeSurface(pinky[i]);
     }
     SDL_FreeSurface(fghost);
-
+    SDL_FreeSurface(dghost);
 }
 
 void Move(SDL_Rect* pos,int direction)
