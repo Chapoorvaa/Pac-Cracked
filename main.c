@@ -70,14 +70,16 @@ int get_input(){
     return input;
 }
 
-char* randomMapPath(){
+void randomMapPath(char* pathPng, char* pathTxt){
+    // pathPng and pathTxt should be heap allocated
     srand(time(NULL));
     int r = rand() % 6 + 1;
     // path -> ./png/map_x.png
     // with x a value between 1 and 6
-    char* path = malloc(sizeof(char) * 15);
-    sprintf(path, "./png/map_%d.png", r);
-    return path;
+    sprintf(pathPng, "./png/map_%d.png", r);
+    // path -> ./maps/map_x.txt
+    // with x a value between 1 and 6
+    sprintf(pathTxt, "./maps/map_%d.txt", r);
 }
 
 Game *init_game(int is_ai, int difficulty, int map_load){

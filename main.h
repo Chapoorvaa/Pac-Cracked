@@ -41,6 +41,8 @@ typedef struct Game{
 
 llist* init_ghosts(int difficulty);
 
+void randomMapPath(char* pathPng, char* pathTxt);
+
 Game *init_game(int is_ai, int difficulty, int map_load);
 
 void free_game(Game* game);
