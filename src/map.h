@@ -9,6 +9,8 @@ typedef struct Map{
     int points;
 }Map;
 
+int randomint(int min, int max);
+
 Map *init_map();
 
 void free_map(Map* map);

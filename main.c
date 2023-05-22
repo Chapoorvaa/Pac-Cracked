@@ -263,7 +263,7 @@ int main(int argc, char** argv){
     //   .Init player and ghosts
 	int is_ai = argv[2][0] - '0';
 	int difficulty = argv[1][0] - '0';
-	int map_load = 1;
+	int map_load = 0;
     int ch = 0;
     int prev_ch = 0;
     int countdown = 10;

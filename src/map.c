@@ -8,10 +8,17 @@
 #define ROW 29
 #define COL 27
 
+int randomint(int min, int max){
+    srand(time(0));
+    return min + rand() % (max - min);
+}
+
 Map *init_map(){
-	Map *map = malloc(sizeof(Map));
-	map->grid = malloc(ROW * COL * sizeof(char));
-	map->points = 0;
+    int num = randomint(1, 7);
+    char path[15];
+    sprintf(path, "maps/map_%d.txt", num);
+    printf("%s\n", path);
+    Map* map = load_map(path);
 	return map;
 }
 
@@ -22,16 +29,15 @@ void free_map(Map* map){
 
 Map* load_map(char* path){
 	Map *map = malloc(sizeof(Map));
-	map->grid = malloc(sizeof(char) * ROW * COL);
+	map->grid = malloc(sizeof(char) * (ROW * COL));
 	map->points = 0;
 	FILE *f;
 	f = fopen(path, "r");
 	if (f == NULL){
+        printf("Map not found!\n");
 		return NULL;
 	}
-    if (fscanf(f, "%[^\n]", map->grid)!= 1) {
-        return NULL;
-    }
+    fgets(map->grid, sizeof(char) * ROW * COL, f);
 	fclose(f);
 	return map;
 }
