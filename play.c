@@ -15,6 +15,7 @@
 enum{HAUT,BAS,GAUCHE,DROITE};
 
 int score = 0;
+int lives = 0;
 int game_won;
 int image_width, image_height;
 
@@ -262,7 +263,38 @@ void Move(SDL_Rect* pos,int direction)
     }
 } 
 
+void drawScore(SDL_Renderer* renderer,Game* game)
+{
+    
+    char scoreText[20];
+    score = game->map->points;
+    sprintf(scoreText, "%d", score);
+    TTF_Font* font = TTF_OpenFont("Paperkind.ttf", 65);
+    SDL_Color text_color = { 255, 255,255, 255 };
+    SDL_Surface* scoreSurface = TTF_RenderText_Solid(font, scoreText, text_color);
+    SDL_Texture* scoreTexture = SDL_CreateTextureFromSurface(renderer, scoreSurface);
+    SDL_Rect scoreTextRect = { 950, 300, scoreSurface->w, scoreSurface->h };
+    SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreTextRect);
+    SDL_FreeSurface(scoreSurface);
+    SDL_DestroyTexture(scoreTexture);
+    TTF_CloseFont(font);
+}
 
+void drawLives(SDL_Renderer* renderer,Game* game)
+{
+    char scoreText[20];
+    lives = game->pacman->lives;
+    sprintf(scoreText, "%d", lives);
+    TTF_Font* font = TTF_OpenFont("Paperkind.ttf", 65);
+    SDL_Color text_color = { 255, 255,255, 255 };
+    SDL_Surface* scoreSurface = TTF_RenderText_Solid(font, scoreText, text_color);
+    SDL_Texture* scoreTexture = SDL_CreateTextureFromSurface(renderer, scoreSurface);
+    SDL_Rect scoreTextRect = { 1005, 575, scoreSurface->w, scoreSurface->h };
+    SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreTextRect);
+    SDL_FreeSurface(scoreSurface);
+    SDL_DestroyTexture(scoreTexture);
+    TTF_CloseFont(font);
+}
 
 
 void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
@@ -332,10 +364,15 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
     SDL_FreeSurface(bg_surface);
     SDL_Rect bg_rect = { 0, 0, 1200,928};
 
+    score =0;
+
     while (game_over(game) == 0 && all_eaten(game) == 1){
         
         SDL_RenderCopy(renderer, bg_texture, NULL, &bg_rect);
         SDL_RenderCopy(renderer, map_texture, NULL, &map_rect);
+        drawScore(renderer,game);
+        drawLives(renderer,game);
+        
         for (int i = 0;i<COL;i++)
         {
             for(int j=0;j<ROW;j++)
@@ -367,7 +404,7 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
         position.x= (game->pacman->x*TILE_SIZE);
         position.y= (game->pacman->y*TILE_SIZE); 
         pac_texture = SDL_CreateTextureFromSurface(renderer, pacmanActuel);
-        SDL_RenderCopy(renderer, pac_texture, NULL, &position);  
+        SDL_RenderCopy(renderer, pac_texture, NULL, &position);
     
         SDL_RenderPresent(renderer);  
         
