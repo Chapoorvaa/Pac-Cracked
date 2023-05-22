@@ -19,6 +19,7 @@ Map *init_map(){
     sprintf(path, "maps/map_%d.txt", num);
     printf("%s\n", path);
     Map* map = load_map(path);
+    map->num = num;
 	return map;
 }
 

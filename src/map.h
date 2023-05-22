@@ -7,6 +7,7 @@
 typedef struct Map{
     char* grid;
     int points;
+    int num;
 }Map;
 
 int randomint(int min, int max);
