@@ -72,11 +72,11 @@ int get_input(){
 
 char* randomMapPath(){
     srand(time(NULL));
-    int rand = rand() % 6 + 1;
+    int r = rand() % 6 + 1;
     // path -> ./png/map_x.png
     // with x a value between 1 and 6
     char* path = malloc(sizeof(char) * 15);
-    sprintf(path, "./png/map_%d.png", rand);
+    sprintf(path, "./png/map_%d.png", r);
     return path;
 }
 
