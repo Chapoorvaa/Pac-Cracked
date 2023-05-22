@@ -20,4 +20,4 @@ main: $(OBJ)
 
 clean:
 	rm -f $(OBJ) main
-	rm -f $(OBJT) test
+	rm -f $(OBJT) test combined.png
