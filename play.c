@@ -9,6 +9,8 @@
 #include "pacman_ai/search.h"
 
 #define TILE_SIZE 32
+#define TT '.'
+#define PP 'o'
 enum{HAUT,BAS,GAUCHE,DROITE};
 
 int score = 0;
@@ -143,19 +145,55 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
 
     SDL_RenderCopy(renderer, pac_texture, NULL, &position);
     SDL_RenderPresent(renderer);
+
+    SDL_Surface* pp = IMG_Load("characters/power_pellet.png");
+    SDL_Texture* pp_texture = SDL_CreateTextureFromSurface(renderer, pp);
+    SDL_FreeSurface(pp);
+    SDL_Surface* tt = IMG_Load("characters/tic_tac.png");
+    SDL_Texture* tt_texture = SDL_CreateTextureFromSurface(renderer, tt);
+    SDL_FreeSurface(tt);
       
     //int ch = 0;
     //int prev_ch = 0;
     int countdown = 10;
     int state = 0; 
-    int pos;   
+    int pos;  
+    char c; 
 
     while (game_over(game) == 0 && all_eaten(game) == 1){
 
-        position.x= (game->pacman->x*TILE_SIZE) +30; //30
-        position.y= (game->pacman->y*TILE_SIZE)+31; //31
+        
+               
+        position.x= (game->pacman->x*TILE_SIZE); //30
+        position.y= (game->pacman->y*TILE_SIZE); //31
         SDL_RenderCopy(renderer, map_texture, NULL, &map_rect);
         SDL_RenderCopy(renderer, pac_texture, NULL, &position);
+        for (int i = 0;i<COL;i++)
+        {
+            for(int j=0;j<ROW;j++)
+            {
+                position.x=i*TILE_SIZE;
+                position.y= j*TILE_SIZE;
+                c=game->map->grid[i+j*COL];
+                switch(c)
+                {
+                    case '.':
+                        SDL_RenderCopy(renderer, tt_texture, NULL, &position);
+
+                        break;
+                    case 'o':
+                        SDL_RenderCopy(renderer, pp_texture, NULL, &position);
+                        break;
+                    default:
+                        break;
+
+                }
+
+            }
+        } 
+        
+        
+
         SDL_RenderPresent(renderer);  
         
         if (game->is_ai != 1){
