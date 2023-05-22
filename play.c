@@ -130,10 +130,13 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
  
     SDL_Surface *pacman[4]={NULL};
     SDL_Surface *pacmanActuel = NULL;
-    
 
+    pacman[HAUT]= IMG_Load("characters/pacman_up.png");
     pacman[BAS]= IMG_Load("characters/pacman_down.png");
-    pacmanActuel= pacman[BAS];
+    pacman[GAUCHE]= IMG_Load("characters/pacman_left.png");
+    pacman[DROITE]= IMG_Load("characters/pacman_right.png");
+
+    pacmanActuel= pacman[DROITE];
     SDL_Texture* pac_texture = SDL_CreateTextureFromSurface(renderer, pacmanActuel);
     int pac_x = game->pacman->x*TILE_SIZE;
     int pac_y = game->pacman->y*TILE_SIZE;
@@ -163,6 +166,7 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
         position.x= (game->pacman->x*TILE_SIZE);//30
         position.y= (game->pacman->y*TILE_SIZE); //31
         SDL_RenderCopy(renderer, map_texture, NULL, &map_rect);
+        pac_texture = SDL_CreateTextureFromSurface(renderer, pacmanActuel);
         SDL_RenderCopy(renderer, pac_texture, NULL, &position);
         for (int i = 0;i<COL;i++)
         {
@@ -209,24 +213,28 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
                         case SDLK_UP:
                             if (game->map->grid[pos + UP] != WALL && game->map->grid[pos + UP] != WALL2){
                                 game->pacman->direction = UP; 
+                                pacmanActuel = pacman[HAUT];
                                 Move(&position,HAUT);
                             }
                             break;
                         case SDLK_DOWN:
                             if (game->map->grid[pos + DOWN] != WALL && game->map->grid[pos + DOWN] != WALL2){
                                 game->pacman->direction = DOWN;
+                                pacmanActuel = pacman[BAS];
                                 Move(&position,BAS);
                             }
                             break;
                         case SDLK_LEFT:
                             if (game->map->grid[pos + LEFT] != WALL && game->map->grid[pos + LEFT] != WALL2){
                                 game->pacman->direction = LEFT;
+                                pacmanActuel = pacman[GAUCHE];
                                 Move(&position,GAUCHE);
                             }
                             break;
                         case SDLK_RIGHT:
                             if (game->map->grid[pos + RIGHT] != WALL && game->map->grid[pos + RIGHT] != WALL2){
                                 game->pacman->direction = RIGHT;
+                                pacmanActuel = pacman[DROITE];
                                 Move(&position,DROITE);
                             }
                             break;
