@@ -374,7 +374,7 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
         if (game->is_ai != 1){
             pos = game->pacman->x + game->pacman->y * COL;
             SDL_Event event;
-            while (SDL_WaitEvent(&event)) {
+            while (SDL_PollEvent(&event)) {
     
                 if (event.type == SDL_QUIT) {
                     SDL_DestroyTexture(map_texture);
@@ -426,7 +426,7 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
                 }
             }
             state = update(game);
-            
+            msleep(200);
             
 		}
 		else{
