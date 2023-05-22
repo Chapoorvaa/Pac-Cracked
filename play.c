@@ -4,6 +4,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <unistd.h>
+#include <time.h>
+#include <errno.h>  
 
 #include "main.h"
 #include "pacman_ai/search.h"
@@ -18,6 +20,27 @@ int image_width, image_height;
 int get_input();
 int all_eaten(Game* game);
 void draw_final(SDL_Renderer* renderer);
+
+int msleep(long msec)
+{
+    struct timespec ts;
+    int res;
+
+    if (msec < 0)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    ts.tv_sec = msec / 1000;
+    ts.tv_nsec = (msec % 1000) * 1000000;
+
+    do {
+        res = nanosleep(&ts, &ts);
+    } while (res && errno == EINTR);
+
+    return res;
+}
 
 void draw_save(SDL_Renderer* renderer,Game* game)
 {
@@ -112,43 +135,46 @@ void draw_Ghost(SDL_Renderer* renderer,Game* game,SDL_Rect* position)
    
     SDL_Surface* fghost = IMG_Load("characters/fghost.png");
 
-    if (game->globalGhostFrightened!=0)
+    if (game->globalGhostFrightened!=0) // need to add a condition is not dead
     {
     //frightened mode
         for (size_t i = 0; i < game->ghosts->length; i++){
             Ghost* ghost = llist_use(game->ghosts, i);
+            if (ghost->mode !=DEAD)
+            {
             
-            if (i==0)
-            {
-                position->x= (ghost->x*TILE_SIZE);
-                position->y= (ghost->y* TILE_SIZE);
-                blinkyActuel=fghost;
-                blinky_texture = SDL_CreateTextureFromSurface(renderer, blinkyActuel);
-                SDL_RenderCopy(renderer, blinky_texture, NULL, position);
-            }
-            if (i==1)
-            {
-                position->x= (ghost->x*TILE_SIZE);
-                position->y= (ghost->y* TILE_SIZE);
-                clydeActuel=fghost;
-                clyde_texture = SDL_CreateTextureFromSurface(renderer, clydeActuel);
-                SDL_RenderCopy(renderer, clyde_texture, NULL, position);
-            }
-            if (i==2)
-            {
-                position->x= (ghost->x*TILE_SIZE);
-                position->y= (ghost->y* TILE_SIZE);
-                inkyActuel=fghost;
-                inky_texture = SDL_CreateTextureFromSurface(renderer,inkyActuel);
-                SDL_RenderCopy(renderer, inky_texture, NULL, position);
-            }
-            if (i==3)
-            {
-                position->x= (ghost->x*TILE_SIZE);
-                position->y= (ghost->y* TILE_SIZE);
-                pinkyActuel=fghost;
-                pinky_texture = SDL_CreateTextureFromSurface(renderer, pinkyActuel);
-                SDL_RenderCopy(renderer, pinky_texture, NULL, position);
+                if (i==0)
+                {
+                    position->x= (ghost->x*TILE_SIZE);
+                    position->y= (ghost->y* TILE_SIZE);
+                    blinkyActuel=fghost;
+                    blinky_texture = SDL_CreateTextureFromSurface(renderer, blinkyActuel);
+                    SDL_RenderCopy(renderer, blinky_texture, NULL, position);
+                }
+                if (i==1)
+                {
+                    position->x= (ghost->x*TILE_SIZE);
+                    position->y= (ghost->y* TILE_SIZE);
+                    clydeActuel=fghost;
+                    clyde_texture = SDL_CreateTextureFromSurface(renderer, clydeActuel);
+                    SDL_RenderCopy(renderer, clyde_texture, NULL, position);
+                }
+                if (i==2)
+                {
+                    position->x= (ghost->x*TILE_SIZE);
+                    position->y= (ghost->y* TILE_SIZE);
+                    inkyActuel=fghost;
+                    inky_texture = SDL_CreateTextureFromSurface(renderer,inkyActuel);
+                    SDL_RenderCopy(renderer, inky_texture, NULL, position);
+                }
+                if (i==3)
+                {
+                    position->x= (ghost->x*TILE_SIZE);
+                    position->y= (ghost->y* TILE_SIZE);
+                    pinkyActuel=fghost;
+                    pinky_texture = SDL_CreateTextureFromSurface(renderer, pinkyActuel);
+                    SDL_RenderCopy(renderer, pinky_texture, NULL, position);
+                }
             }
         
         }
@@ -157,98 +183,101 @@ void draw_Ghost(SDL_Renderer* renderer,Game* game,SDL_Rect* position)
     {
         for (size_t i = 0; i < game->ghosts->length; i++){
             Ghost* ghost = llist_use(game->ghosts, i);
-            if (i==0)
+            if (ghost->mode !=DEAD)
             {
-                switch(ghost->direction)
+                if (i==0)
                 {
-                    case up:
-                        blinkyActuel = blinky[HAUT];
-                        break;
-                    case down:
-                        blinkyActuel = blinky[BAS];
-                        break;
-                    case left:
-                        blinkyActuel = blinky[GAUCHE];
-                        break;
-                    case right:
-                        blinkyActuel=blinky[DROITE];
-
-
+                    switch(ghost->direction)
+                    {
+                        case up:
+                            blinkyActuel = blinky[HAUT];
+                            break;
+                        case down:
+                            blinkyActuel = blinky[BAS];
+                            break;
+                        case left:
+                            blinkyActuel = blinky[GAUCHE];
+                            break;
+                        case right:
+                            blinkyActuel=blinky[DROITE];
+                            break;
+                    }
+                    position->x= (ghost->x*TILE_SIZE);
+                    position->y= (ghost->y* TILE_SIZE);
+                    blinky_texture = SDL_CreateTextureFromSurface(renderer, blinkyActuel);
+                    SDL_RenderCopy(renderer, blinky_texture, NULL, position);
                 }
-                position->x= (ghost->x*TILE_SIZE);
-                position->y= (ghost->y* TILE_SIZE);
-                blinky_texture = SDL_CreateTextureFromSurface(renderer, blinkyActuel);
-                SDL_RenderCopy(renderer, blinky_texture, NULL, position);
-            }
-            if (i==1)
-            {
-                switch(ghost->direction)
+                if (i==1)
                 {
-                    case up:
-                        clydeActuel = clyde[HAUT];
-                        break;
-                    case down:
-                        clydeActuel = clyde[BAS];
-                        break;
-                    case left:
-                        clydeActuel = clyde[GAUCHE];
-                        break;
-                    case right:
-                        clydeActuel=clyde[DROITE];
+                    switch(ghost->direction)
+                    {
+                        case up:
+                            clydeActuel = clyde[HAUT];
+                            break;
+                        case down:
+                            clydeActuel = clyde[BAS];
+                            break;
+                        case left:
+                            clydeActuel = clyde[GAUCHE];
+                            break;
+                        case right:
+                            clydeActuel=clyde[DROITE];
+                            break;
 
-
+                    }
+                    position->x= (ghost->x*TILE_SIZE);
+                    position->y= (ghost->y* TILE_SIZE);
+                    clyde_texture = SDL_CreateTextureFromSurface(renderer, clydeActuel);
+                    SDL_RenderCopy(renderer, clyde_texture, NULL, position);
                 }
-                position->x= (ghost->x*TILE_SIZE);
-                position->y= (ghost->y* TILE_SIZE);
-                clyde_texture = SDL_CreateTextureFromSurface(renderer, clydeActuel);
-                SDL_RenderCopy(renderer, clyde_texture, NULL, position);
-            }
-            if (i==2)
-            {
-                switch(ghost->direction)
+                if (i==2)
                 {
-                    case up:
-                        inkyActuel = inky[HAUT];
-                        break;
-                    case down:
-                        inkyActuel = inky[BAS];
-                        break;
-                    case left:
-                        inkyActuel = inky[GAUCHE];
-                        break;
-                    case right:
-                        inkyActuel=inky[DROITE];
+                    switch(ghost->direction)
+                    {
+                        case up:
+                            inkyActuel = inky[HAUT];
+                            break;
+                        case down:
+                            inkyActuel = inky[BAS];
+                            break;
+                        case left:
+                            inkyActuel = inky[GAUCHE];
+                            break;
+                        case right:
+                            inkyActuel=inky[DROITE];
+                            break;
 
-
+                    }
+                    position->x= (ghost->x*TILE_SIZE);
+                    position->y= (ghost->y* TILE_SIZE);
+                    inky_texture = SDL_CreateTextureFromSurface(renderer, inkyActuel);
+                    SDL_RenderCopy(renderer, inky_texture, NULL, position);
                 }
-                position->x= (ghost->x*TILE_SIZE);
-                position->y= (ghost->y* TILE_SIZE);
-                inky_texture = SDL_CreateTextureFromSurface(renderer, inkyActuel);
-                SDL_RenderCopy(renderer, inky_texture, NULL, position);
-            }
-            if (i==0)
-            {
-                switch(ghost->direction)
+                if (i==3)
                 {
-                    case up:
-                        pinkyActuel = pinky[HAUT];
-                        break;
-                    case down:
-                        pinkyActuel = pinky[BAS];
-                        break;
-                    case left:
-                        pinkyActuel = pinky[GAUCHE];
-                        break;
-                    case right:
-                        pinkyActuel=pinky[DROITE];
-
-
+                    switch(ghost->direction)
+                    {
+                        case up:
+                            pinkyActuel = pinky[HAUT];
+                            break;
+                        case down:
+                            pinkyActuel = pinky[BAS];
+                            break;
+                        case left:
+                            pinkyActuel = pinky[GAUCHE];
+                    
+                            break;
+                         case right:
+                            pinkyActuel=pinky[DROITE];
+                            break;
+                    }
+                    position->x= (ghost->x*TILE_SIZE);
+                    position->y= (ghost->y* TILE_SIZE);
+                    pinky_texture = SDL_CreateTextureFromSurface(renderer, pinkyActuel);
+                    SDL_RenderCopy(renderer, pinky_texture, NULL, position);
+                
                 }
-                position->x= (ghost->x*TILE_SIZE);
-                position->y= (ghost->y* TILE_SIZE);
-                pinky_texture = SDL_CreateTextureFromSurface(renderer, pinkyActuel);
-                SDL_RenderCopy(renderer, pinky_texture, NULL, position);
-            }
+            }   
         }
     }
     for (int i =0;i<4;i++)
@@ -260,8 +289,6 @@ void draw_Ghost(SDL_Renderer* renderer,Game* game,SDL_Rect* position)
     }
 
 }
-
-
 
 void Move(SDL_Rect* pos,int direction)
 {
@@ -284,8 +311,6 @@ void Move(SDL_Rect* pos,int direction)
         break;
     }
 } 
-
-
 
 
 void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
@@ -342,8 +367,6 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
     SDL_Surface* tt = IMG_Load("characters/tic_tac.png");
     SDL_Texture* tt_texture = SDL_CreateTextureFromSurface(renderer, tt);
     SDL_FreeSurface(tt);
-
-
 
     int countdown = 10;
     int state = 0; 
@@ -457,7 +480,7 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
                     game->pacman->direction = Bellman(game, pos);
                     break;
             }
-            sleep(0.99);  ///////////need to be modified
+            msleep(200);// need to be modified
             
             state = update(game);
             if (game->pacman->direction == RIGHT)
@@ -487,11 +510,6 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
             break;
         }       
     }
-    
-    for (int i =0;i<4;i++)
-    {
-        SDL_FreeSurface(pacman[i]);
-    }
     score = game->map->points;
     game_won = game->pacman->lives;
     /*
@@ -499,6 +517,10 @@ void draw_game(SDL_Renderer* renderer,Game* game,int map_load)
     {
         draw_save(renderer,game);
     }*/
+    for (int i =0;i<4;i++)
+    {
+        SDL_FreeSurface(pacman[i]);
+    }
     free_game(game);
     draw_final(renderer);
     //SDL_DestroyTexture(map_texture);

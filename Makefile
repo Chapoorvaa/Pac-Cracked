@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -O3 -Werror -pedantic -std=c99 -g -fsanitize=address -lm `pkg-config --cflags sdl2 SDL2_image SDL2_ttf`
+CFLAGS = -Wall -Wextra -Werror  -pedantic -std=c99 -g -fsanitize=address -lm `pkg-config --cflags sdl2 SDL2_image SDL2_ttf`
 LDFLAGS =
 LDLIBS = `pkg-config --libs sdl2 SDL2_image SDL2_ttf`
 
