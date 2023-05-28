@@ -43,7 +43,6 @@ llist* init_ghosts(int difficulty){
         return ghosts;
     }
 }
-
 // get input from keyboard
 int getch(){
     struct termios oldtc, newtc;
